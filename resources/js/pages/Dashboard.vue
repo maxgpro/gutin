@@ -19,9 +19,14 @@ const breadcrumbs: BreadcrumbItem[] = [
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
             <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-                <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
+                <a
+                    href="/hh/redirect"
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-block px-4 py-2 rounded-md bg-black text-white hover:opacity-90"
+                >
+                    Войти через hh.ru
+                </a>
                 <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                     <PlaceholderPattern />
                 </div>

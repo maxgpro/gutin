@@ -45,4 +45,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    
+    public function hhAccounts() {
+        return $this->hasMany(\App\Models\HhAccount::class);
+    }
 }

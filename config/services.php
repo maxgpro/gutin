@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'hh' => [
+        'client_id'     => env('HH_CLIENT_ID'),
+        'client_secret' => env('HH_CLIENT_SECRET'),
+        'redirect'      => env('HH_REDIRECT_URI'),
+        'user_agent'    => env('HH_APP_USER_AGENT', 'auto-hh-app/1.0'),
+        'api_base'      => env('HH_API_BASE', 'https://api.hh.ru'),
+        'oauth_base'    => env('HH_OAUTH_BASE', 'https://hh.ru'),
+        'scopes'        => array_filter(preg_split('/[,\s]+/', env('HH_SCOPES', ''))),
+    ],
+
 ];
