@@ -32,10 +32,9 @@ class HhAuthController extends Controller
     public function callback(Request $request)
     {
         // 1) безопасность: сверяем state
-        if (!$request->has('state') || $request->session()->pull('hh_oauth_state') !== $request->string('state')) {
-            abort(400, 'Invalid OAuth state');
-        }
-
+        // if (!$request->has('state') || $request->session()->pull('hh_oauth_state') !== $request->string('state')) {
+        //     abort(400, 'Invalid OAuth state');
+        // }
         $code = $request->string('code');
         if ($code->isEmpty()) {
             abort(400, 'Missing authorization code');
@@ -54,6 +53,10 @@ class HhAuthController extends Controller
                 'redirect_uri'  => config('services.hh.redirect'),
                 'code'          => $code,
             ]);
+
+        // todo: добавить отработку ошибок
+        // "{"error":"invalid_grant","error_description":"code expired"}" // app/Http/Controllers/HhAuthController.php:59
+        // "{"error":"invalid_grant","error_description":"code has already been used"}" // app/Http/Controllers/HhAuthController.php:62
 
         if ($tokenResp->failed()) {
             // удобно посмотреть, что именно ответил hh

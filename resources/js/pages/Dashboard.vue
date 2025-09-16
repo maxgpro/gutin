@@ -20,7 +20,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
             <div class="grid auto-rows-min gap-4 md:grid-cols-3">
                 <a
-                    href="/hh/redirect"
+                    href="/hh/oauth/redirect"
                     target="_blank"
                     rel="noopener"
                     class="inline-block px-4 py-2 rounded-md bg-black text-white hover:opacity-90"
