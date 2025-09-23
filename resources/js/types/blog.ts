@@ -30,7 +30,9 @@ export interface BlogCategory {
     name: string;
     slug: string;
     color: string;
-    posts_count: number;
+    description?: string | null;
+    is_active?: boolean;
+    posts_count?: number;
 }
 
 // Типы для Laravel пагинации
@@ -82,4 +84,16 @@ export interface BlogPostsEditProps {
 export interface BlogPostsShowProps {
     post: BlogPost;
     relatedPosts: BlogPost[];
+}
+
+export interface BlogCategoriesIndexProps {
+    categories: BlogCategory[];
+}
+
+export interface BlogCategoriesCreateProps {
+    // Пустой интерфейс для создания категории
+}
+
+export interface BlogCategoriesEditProps {
+    category: BlogCategory;
 }
