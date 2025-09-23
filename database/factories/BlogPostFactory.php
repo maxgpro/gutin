@@ -74,7 +74,8 @@ npm run dev',
             'slug' => null, // Will be auto-generated from title
             'excerpt' => fake()->paragraph(3),
             'content' => $content,
-            'featured_image' => fake()->boolean(60) ? fake()->imageUrl(800, 400, 'technology') : null,
+            // 'featured_image' => fake()->boolean(60) ? fake()->imageUrl(800, 400, 'technology') : null,
+            'featured_image' => null,
             'meta_data' => [
                 'meta_title' => $title,
                 'meta_description' => fake()->sentence(15),

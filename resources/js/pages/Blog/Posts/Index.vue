@@ -3,15 +3,16 @@ import BlogPostCard from '@/components/BlogPostCard.vue';
 import Icon from '@/components/Icon.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import LaravelPaginationAdapter from '@/components/ui/LaravelPaginationAdapter.vue';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import blog from '@/routes/blog';
 import { type BreadcrumbItem } from '@/types';
+import type { BlogPostsIndexProps } from '@/types/blog';
 import { router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
-import { ref, watch, computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,74 +21,32 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface BlogPost {
-    id: number;
-    title: string;
-    slug: string;
-    excerpt: string | null;
-    featured_image: string | null;
-    status: string;
-    published_at: string | null;
-    views_count: number;
-    reading_time: number;
-    user: {
-        id: number;
-        name: string;
-    };
-    category: {
-        id: number;
-        name: string;
-        slug: string;
-        color: string;
-    };
-}
+const props = defineProps<BlogPostsIndexProps>();
 
-interface BlogCategory {
-    id: number;
-    name: string;
-    slug: string;
-    color: string;
-    posts_count: number;
-}
-
-interface Props {
-    posts: {
-        data: BlogPost[];
-        links: Array<{ url: string | null; label: string; active: boolean }>;
-    };
-    categories: BlogCategory[];
-    filters: {
-        search?: string;
-        category?: string;
-        status?: string;
-    };
-}
-
-const props = defineProps<Props>();
-
-const form = ref({
+const form = ref<{
+    search: string;
+    category: string | null;
+}>({
     search: props.filters.search || '',
-    category: props.filters.category || '',
+    category: props.filters.category || null,
 });
 
 // Адаптируем Laravel пагинацию для Shadcn-vue
 const paginationData = computed(() => {
     if (!props.posts.links || props.posts.links.length < 3) return null;
-    
+
     // Находим текущую страницу
-    const currentPageLink = props.posts.links.find(link => link.active);
+    const currentPageLink = props.posts.links.find((link) => link.active);
     const currentPage = currentPageLink ? parseInt(currentPageLink.label) : 1;
-    
+
     // Находим общее количество страниц
-    const pageNumbers = props.posts.links
-        .filter(link => link.label.match(/^\d+$/))
-        .map(link => parseInt(link.label));
+    const pageNumbers = props.posts.links.filter((link) => link.label.match(/^\d+$/)).map((link) => parseInt(link.label));
     const totalPages = pageNumbers.length > 0 ? Math.max(...pageNumbers) : 1;
-    
+
     // Предположим, что у нас есть 12 постов на страницу (можно сделать это конфигурируемым)
     const itemsPerPage = Math.ceil(props.posts.data.length) || 12;
     const total = totalPages * itemsPerPage;
-    
+
     return {
         currentPage,
         totalPages,
@@ -108,22 +67,33 @@ watch(
 );
 
 function navigate(url: string) {
-    router.get(url, {}, {
-        preserveState: true,
-        preserveScroll: true,
-    });
+    router.get(
+        url,
+        {},
+        {
+            preserveState: true,
+            preserveScroll: true,
+        },
+    );
 }
 
 function goToPage(pageNumber: number) {
     // Находим ссылку для нужной страницы в Laravel пагинации
-    const pageLink = props.posts.links.find(link => 
-        link.label === pageNumber.toString()
-    );
-    
+    const pageLink = props.posts.links.find((link) => link.label === pageNumber.toString());
+
     if (pageLink?.url) {
         navigate(pageLink.url);
     }
 }
+
+const categoryModel = computed({
+    // GET: что отдаём Select-у
+    get: () => form.value.category ?? '', // null → '' (Select покажет placeholder)
+    // SET: что записываем обратно в форму
+    set: (v: string) => {
+        form.value.category = v || null;
+    }, // '' → null, иначе строка-слуг
+});
 
 function updateFilters() {
     const params = new URLSearchParams();
@@ -158,8 +128,8 @@ function updateFilters() {
                             <SelectValue placeholder="All Categories" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">All Categories</SelectItem>
-                            <SelectItem v-for="category in categories" :key="category.id" :value="category.slug">
+                            <SelectItem value="_all">All Categories</SelectItem>
+                            <SelectItem v-for="category in categories" :key="category.id" :value="String(category.slug)">
                                 {{ category.name }}
                             </SelectItem>
                         </SelectContent>
@@ -185,35 +155,8 @@ function updateFilters() {
 
             <!-- Pagination -->
             <div v-if="paginationData && paginationData.totalPages > 1" class="mt-8">
-                <Pagination 
-                    v-slot="{ page }" 
-                    :items-per-page="paginationData.itemsPerPage" 
-                    :total="paginationData.total" 
-                    :default-page="paginationData.currentPage"
-                    @update:page="goToPage"
-                >
-                    <PaginationContent v-slot="{ items }">
-                        <PaginationPrevious />
-
-                        <template v-for="(item, index) in items" :key="index">
-                            <PaginationItem
-                                v-if="item.type === 'page'"
-                                :value="item.value"
-                                :is-active="item.value === page"
-                            >
-                                {{ item.value }}
-                            </PaginationItem>
-                        </template>
-
-                        <PaginationEllipsis :index="4" />
-
-                        <PaginationNext />
-                    </PaginationContent>
-                </Pagination>
+                <LaravelPaginationAdapter :total="props.posts.total" :perPage="props.posts.per_page" :currentPage="props.posts.current_page" />
             </div>
-
-
-
         </div>
     </AppLayout>
 </template>

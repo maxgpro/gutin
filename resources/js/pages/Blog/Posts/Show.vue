@@ -7,37 +7,11 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import blog from '@/routes/blog';
 import { type BreadcrumbItem } from '@/types';
+import { type BlogPostsShowProps } from '@/types/blog';
 import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
-interface BlogPost {
-    id: number;
-    title: string;
-    slug: string;
-    content: string;
-    featured_image: string | null;
-    published_at: string | null;
-    views_count: number;
-    reading_time: number;
-    user: {
-        id: number;
-        name: string;
-    };
-    category: {
-        id: number;
-        name: string;
-        slug: string;
-        color: string;
-    };
-    user_id: number;
-}
-
-interface Props {
-    post: BlogPost;
-    relatedPosts: BlogPost[];
-}
-
-const props = defineProps<Props>();
+const props = defineProps<BlogPostsShowProps>();
 const page = usePage();
 
 const breadcrumbs: BreadcrumbItem[] = [

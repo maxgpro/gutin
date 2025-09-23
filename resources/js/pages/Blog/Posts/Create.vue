@@ -11,6 +11,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import blog from '@/routes/blog';
 import { type BreadcrumbItem } from '@/types';
+import { type BlogPostsCreateProps } from '@/types/blog';
 import { useForm } from '@inertiajs/vue3';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -24,17 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface BlogCategory {
-    id: number;
-    name: string;
-    slug: string;
-}
-
-interface Props {
-    categories: BlogCategory[];
-}
-
-const props = defineProps<Props>();
+const props = defineProps<BlogPostsCreateProps>();
 
 const form = useForm({
     title: '',
