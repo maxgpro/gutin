@@ -47,7 +47,7 @@ const categoryModel = computed({
     // GET: что отдаём Select-у
     get: () => form.value.category ?? '_all', // null → '_all' (Select покажет "All Categories")
     // SET: что записываем обратно в форму
-    set: (v: string) => form.value.category = v === '_all' ? null : v, // '_all' → null, иначе slug
+    set: (v: string) => (form.value.category = v === '_all' ? null : v), // '_all' → null, иначе slug
 });
 
 function updateFilters() {

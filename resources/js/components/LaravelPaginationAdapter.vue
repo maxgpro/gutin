@@ -11,9 +11,15 @@ const props = defineProps<{
 }>();
 
 const pageParam = computed(() => props.pageParam ?? 'page');
+const totalPages = computed(() => Math.ceil(props.total / props.perPage));
 
 // построить URL с новым ?page, сохранив остальные фильтры
 function goTo(page: number) {
+    // Проверяем валидность страницы
+    if (page < 1 || page > totalPages.value || page === props.currentPage) {
+        return;
+    }
+
     const url = new URL(window.location.href);
     url.searchParams.set(pageParam.value, String(page));
 
@@ -35,7 +41,7 @@ function goTo(page: number) {
         <PaginationContent v-slot="{ items }">
             <PaginationPrevious />
             <template v-for="(item, index) in items" :key="index">
-                <PaginationItem v-if="item.type === 'page'" :value="item.value" :is-active="item.value === currentPage" @click="goTo(item.value)">
+                <PaginationItem v-if="item.type === 'page'" :value="item.value" :is-active="item.value === currentPage">
                     {{ item.value }}
                 </PaginationItem>
 
