@@ -1,0 +1,233 @@
+<script setup lang="ts">
+import Icon from '@/components/Icon.vue';
+import InputError from '@/components/InputError.vue';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { dashboard } from '@/routes';
+import blog from '@/routes/blog';
+import { type BreadcrumbItem } from '@/types';
+import { useForm } from '@inertiajs/vue3';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: dashboard().url,
+    },
+    {
+        title: 'Blog Posts',
+        href: blog.posts.index().url,
+    },
+];
+
+interface BlogCategory {
+    id: number;
+    name: string;
+    slug: string;
+}
+
+interface Props {
+    categories: BlogCategory[];
+}
+
+const props = defineProps<Props>();
+
+const form = useForm({
+    title: '',
+    slug: '',
+    excerpt: '',
+    content: '',
+    blog_category_id: '',
+    featured_image: '',
+    status: 'draft',
+    published_at: '',
+});
+
+function submit() {
+    form.post(blog.posts.store().url);
+}
+</script>
+
+<template>
+    <Head title="Create Blog Post" />
+
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+            <form @submit.prevent="submit" class="space-y-6">
+                <div class="grid gap-6 md:grid-cols-3">
+                    <!-- Main Content -->
+                    <div class="space-y-6 md:col-span-2">
+                        <div>
+                            <Label for="title">Title *</Label>
+                            <Input
+                                id="title"
+                                v-model="form.title"
+                                placeholder="Enter post title..."
+                                :class="{ 'border-destructive': form.errors.title }"
+                                required
+                            />
+                            <InputError :message="form.errors.title" />
+                        </div>
+
+                        <div>
+                            <Label for="slug">Slug</Label>
+                            <Input
+                                id="slug"
+                                v-model="form.slug"
+                                placeholder="Auto-generated from title"
+                                :class="{ 'border-destructive': form.errors.slug }"
+                            />
+                            <p class="mt-1 text-sm text-muted-foreground">Leave empty to auto-generate from title</p>
+                            <InputError :message="form.errors.slug" />
+                        </div>
+
+                        <div>
+                            <Label for="excerpt">Excerpt</Label>
+                            <Textarea
+                                id="excerpt"
+                                v-model="form.excerpt"
+                                placeholder="Brief description of the post..."
+                                rows="3"
+                                :class="{ 'border-destructive': form.errors.excerpt }"
+                            />
+                            <InputError :message="form.errors.excerpt" />
+                        </div>
+
+                        <div>
+                            <Label for="content">Content *</Label>
+                            <Textarea
+                                id="content"
+                                v-model="form.content"
+                                placeholder="Write your post content here..."
+                                rows="12"
+                                :class="{ 'border-destructive': form.errors.content }"
+                                required
+                            />
+                            <InputError :message="form.errors.content" />
+                        </div>
+                    </div>
+
+                    <!-- Sidebar -->
+                    <div class="space-y-6">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Publish Settings</CardTitle>
+                            </CardHeader>
+                            <CardContent class="space-y-4">
+                                <div>
+                                    <Label for="status">Status</Label>
+                                    <Select v-model="form.status">
+                                        <SelectTrigger>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="draft">Draft</SelectItem>
+                                            <SelectItem value="published">Published</SelectItem>
+                                            <SelectItem value="archived">Archived</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError :message="form.errors.status" />
+                                </div>
+
+                                <div>
+                                    <Label for="published_at">Publish Date</Label>
+                                    <Input
+                                        id="published_at"
+                                        v-model="form.published_at"
+                                        type="datetime-local"
+                                        :class="{ 'border-destructive': form.errors.published_at }"
+                                    />
+                                    <InputError :message="form.errors.published_at" />
+                                </div>
+
+                                <div>
+                                    <Label for="blog_category_id">Category *</Label>
+                                    <Select v-model="form.blog_category_id">
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select category" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem v-for="category in categories" :key="category.id" :value="category.id.toString()">
+                                                {{ category.name }}
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError :message="form.errors.blog_category_id" />
+                                </div>
+
+                                <div>
+                                    <Label for="featured_image">Featured Image URL</Label>
+                                    <Input
+                                        id="featured_image"
+                                        v-model="form.featured_image"
+                                        placeholder="https://example.com/image.jpg"
+                                        :class="{ 'border-destructive': form.errors.featured_image }"
+                                    />
+                                    <InputError :message="form.errors.featured_image" />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex justify-between border-t pt-6">
+                    <Button type="button" variant="outline" :href="blog.posts.index()"> Cancel </Button>
+
+                    <Button type="submit" :disabled="form.processing">
+                        <Icon v-if="form.processing" name="loader-2" class="mr-2 h-4 w-4 animate-spin" />
+                        Create Post
+                    </Button>
+                </div>
+            </form>
+        </div>
+    </AppLayout>
+</template>
+
+<script setup lang="ts">
+import AppShell from '@/components/AppShell.vue';
+import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import Heading from '@/components/Heading.vue';
+import Icon from '@/components/Icon.vue';
+import InputError from '@/components/InputError.vue';
+import { BreadcrumbItem } from '@/components/ui/breadcrumb';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { routes } from '@/routes';
+import { useForm } from '@inertiajs/vue3';
+
+interface BlogCategory {
+    id: number;
+    name: string;
+    slug: string;
+}
+
+interface Props {
+    categories: BlogCategory[];
+}
+
+const props = defineProps<Props>();
+
+const form = useForm({
+    title: '',
+    slug: '',
+    excerpt: '',
+    content: '',
+    blog_category_id: '',
+    featured_image: '',
+    status: 'draft',
+    published_at: '',
+});
+
+function submit() {
+    form.post(blog.posts.store().url);
+}
+</script>

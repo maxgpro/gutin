@@ -1,0 +1,165 @@
+<script setup lang="ts">
+import BlogPostCard from '@/components/BlogPostCard.vue';
+import Icon from '@/components/Icon.vue';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { dashboard } from '@/routes';
+import blog from '@/routes/blog';
+import { type BreadcrumbItem } from '@/types';
+import { usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+
+interface BlogPost {
+    id: number;
+    title: string;
+    slug: string;
+    content: string;
+    featured_image: string | null;
+    published_at: string | null;
+    views_count: number;
+    reading_time: number;
+    user: {
+        id: number;
+        name: string;
+    };
+    category: {
+        id: number;
+        name: string;
+        slug: string;
+        color: string;
+    };
+    user_id: number;
+}
+
+interface Props {
+    post: BlogPost;
+    relatedPosts: BlogPost[];
+}
+
+const props = defineProps<Props>();
+const page = usePage();
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: dashboard().url,
+    },
+    {
+        title: 'Blog Posts',
+        href: blog.posts.index().url,
+    },
+    {
+        title: props.post.category.name,
+        href: blog.categories.show(props.post.category).url,
+    },
+];
+
+const canEdit = computed(() => {
+    const user = page.props.auth?.user as { id: number } | null;
+    return user && user.id === props.post.user_id;
+});
+
+function formatDate(dateString: string | null): string {
+    if (!dateString) return '';
+
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+}
+</script>
+
+<template>
+    <Head :title="post.title" />
+
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+            <!-- Article Header -->
+            <header class="mb-8">
+                <div class="mb-4">
+                    <Badge variant="secondary" :style="{ backgroundColor: post.category.color + '20', color: post.category.color }">
+                        {{ post.category.name }}
+                    </Badge>
+                </div>
+
+                <h1 class="mb-4 text-4xl font-bold">{{ post.title }}</h1>
+
+                <div class="flex items-center justify-between border-b pb-6 text-sm text-muted-foreground">
+                    <div class="flex items-center gap-4">
+                        <span>By {{ post.user.name }}</span>
+                        <span>{{ formatDate(post.published_at) }}</span>
+                        <span class="flex items-center gap-1">
+                            <Icon name="clock" class="h-4 w-4" />
+                            {{ post.reading_time }} min read
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="flex items-center gap-1">
+                            <Icon name="eye" class="h-4 w-4" />
+                            {{ post.views_count }} views
+                        </span>
+
+                        <!-- Edit button for author -->
+                        <Button v-if="canEdit" :href="blog.posts.edit(post)" variant="outline" size="sm">
+                            <Icon name="edit" class="mr-2 h-4 w-4" />
+                            Edit
+                        </Button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Featured Image -->
+            <div v-if="post.featured_image" class="mb-8">
+                <img :src="post.featured_image" :alt="post.title" class="h-64 w-full rounded-lg object-cover sm:h-96" />
+            </div>
+
+            <!-- Article Content -->
+            <article class="prose prose-lg mb-12 max-w-none">
+                <div v-html="post.content"></div>
+            </article>
+
+            <!-- Related Posts -->
+            <div v-if="relatedPosts.length > 0" class="border-t pt-8">
+                <h3 class="mb-6 text-2xl font-semibold">Related Posts</h3>
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <BlogPostCard v-for="relatedPost in relatedPosts" :key="relatedPost.id" :post="relatedPost" />
+                </div>
+            </div>
+        </div>
+    </AppLayout>
+</template>
+
+<style>
+/* Custom styles for the article content */
+.prose {
+    @apply text-foreground;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+    @apply text-foreground;
+}
+
+.prose a {
+    @apply text-primary hover:text-primary/80;
+}
+
+.prose blockquote {
+    @apply border-l-primary text-muted-foreground;
+}
+
+.prose code {
+    @apply rounded bg-muted px-1 py-0.5 text-sm;
+}
+
+.prose pre {
+    @apply bg-muted;
+}
+</style>

@@ -49,4 +49,14 @@ class User extends Authenticatable
     public function hhAccounts() {
         return $this->hasMany(\App\Models\HhAccount::class);
     }
+
+    public function blogPosts()
+    {
+        return $this->hasMany(\App\Models\BlogPost::class);
+    }
+
+    public function publishedBlogPosts()
+    {
+        return $this->blogPosts()->published();
+    }
 }

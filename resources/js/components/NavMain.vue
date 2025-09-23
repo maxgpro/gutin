@@ -16,11 +16,21 @@ const page = usePage();
         <SidebarGroupLabel>Platform</SidebarGroupLabel>
         <SidebarMenu>
             <SidebarMenuItem v-for="item in items" :key="item.title">
-                <SidebarMenuButton as-child :is-active="urlIsActive(item.href, page.url)" :tooltip="item.title">
-                    <Link :href="item.href">
+                <SidebarMenuButton as-child :is-active="!item.external && urlIsActive(item.href, page.url)" :tooltip="item.title">
+                    <Link v-if="!item.external" :href="item.href">
                         <component :is="item.icon" />
                         <span>{{ item.title }}</span>
                     </Link>
+                    <a
+                        v-else
+                        :href="typeof item.href === 'string' ? item.href : item.href.url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="flex items-center gap-2"
+                    >
+                        <component :is="item.icon" />
+                        <span>{{ item.title }}</span>
+                    </a>
                 </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarMenu>
