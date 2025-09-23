@@ -2,7 +2,7 @@
 import Icon from '@/components/Icon.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import blog from '@/routes/blog';
 
 
@@ -89,7 +89,9 @@ function formatDate(dateString: string | null): string {
             <p v-if="post.excerpt" class="mb-4 line-clamp-3 text-muted-foreground">
                 {{ post.excerpt }}
             </p>
+        </CardContent>
 
+        <CardFooter>
             <div class="flex items-center justify-between text-sm text-muted-foreground">
                 <div class="flex items-center gap-4">
                     <span>{{ post.user.name }}</span>
@@ -106,6 +108,6 @@ function formatDate(dateString: string | null): string {
                     </span>
                 </div>
             </div>
-        </CardContent>
+        </CardFooter>
     </Card>
 </template>

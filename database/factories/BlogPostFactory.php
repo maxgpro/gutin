@@ -20,6 +20,20 @@ class BlogPostFactory extends Factory
     protected $model = BlogPost::class;
 
     /**
+     * Generate a placeholder image URL using placehold.co
+     */
+    private function generatePlaceholderImage(): string
+    {
+        $colors = ['3b82f6', '10b981', 'f59e0b', 'ef4444', '8b5cf6', '06b6d4', 'f97316', 'ec4899'];
+        $topics = ['Tech', 'Code', 'Web', 'Dev', 'Blog', 'News', 'IT', 'Laravel'];
+
+        $color = fake()->randomElement($colors);
+        $topic = fake()->randomElement($topics);
+
+        return "https://placehold.co/800x400/{$color}/ffffff/png?text=" . urlencode($topic);
+    }
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
@@ -74,8 +88,7 @@ npm run dev',
             'slug' => null, // Will be auto-generated from title
             'excerpt' => fake()->paragraph(3),
             'content' => $content,
-            // 'featured_image' => fake()->boolean(60) ? fake()->imageUrl(800, 400, 'technology') : null,
-            'featured_image' => null,
+            'featured_image' => fake()->boolean(60) ? $this->generatePlaceholderImage() : null,
             'meta_data' => [
                 'meta_title' => $title,
                 'meta_description' => fake()->sentence(15),
@@ -172,7 +185,7 @@ npm run dev',
     public function withImage(): static
     {
         return $this->state(fn(array $attributes) => [
-            'featured_image' => fake()->imageUrl(800, 400, 'technology'),
+            'featured_image' => $this->generatePlaceholderImage(),
         ]);
     }
 }
