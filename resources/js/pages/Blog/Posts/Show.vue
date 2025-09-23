@@ -8,7 +8,7 @@ import { dashboard } from '@/routes';
 import blog from '@/routes/blog';
 import { type BreadcrumbItem } from '@/types';
 import { type BlogPostsShowProps } from '@/types/blog';
-import { usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const props = defineProps<BlogPostsShowProps>();
@@ -77,9 +77,11 @@ function formatDate(dateString: string | null): string {
                         </span>
 
                         <!-- Edit button for author -->
-                        <Button v-if="canEdit" :href="blog.posts.edit(post)" variant="outline" size="sm">
-                            <Icon name="edit" class="mr-2 h-4 w-4" />
-                            Edit
+                        <Button v-if="canEdit" as-child variant="outline" size="sm">
+                            <Link :href="blog.posts.edit(post).url">
+                                <Icon name="edit" class="mr-2 h-4 w-4" />
+                                Edit
+                            </Link>
                         </Button>
                     </div>
                 </div>

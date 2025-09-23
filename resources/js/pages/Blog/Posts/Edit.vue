@@ -11,8 +11,10 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import blog from '@/routes/blog';
 import { type BreadcrumbItem } from '@/types';
-import { type BlogPostsCreateProps } from '@/types/blog';
-import { Head, useForm } from '@inertiajs/vue3';
+import { type BlogPostsEditProps } from '@/types/blog';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+
+const props = defineProps<BlogPostsEditProps>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -23,28 +25,30 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Blog Posts',
         href: blog.posts.index().url,
     },
+    {
+        title: props.post.title,
+        href: blog.posts.show(props.post).url,
+    },
 ];
 
-const props = defineProps<BlogPostsCreateProps>();
-
 const form = useForm({
-    title: '',
-    slug: '',
-    excerpt: '',
-    content: '',
-    blog_category_id: '',
-    featured_image: '',
-    status: 'draft',
-    published_at: '',
+    title: props.post.title || '',
+    slug: props.post.slug || '',
+    excerpt: props.post.excerpt || '',
+    content: props.post.content || '',
+    blog_category_id: props.post.blog_category_id?.toString() || '',
+    featured_image: props.post.featured_image || '',
+    status: props.post.status || 'draft',
+    published_at: props.post.published_at || '',
 });
 
 function submit() {
-    form.post(blog.posts.store().url);
+    form.put(blog.posts.update(props.post).url);
 }
 </script>
 
 <template>
-    <Head title="Create Blog Post" />
+    <Head :title="`Edit: ${post.title}`" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -54,46 +58,28 @@ function submit() {
                     <div class="space-y-6 md:col-span-2">
                         <h2 class="flex items-center gap-2">
                             <Icon name="edit" class="h-5 w-5" />
-                            New Blog Post
+                            Edit Blog Post
                         </h2>
                         <!-- Title -->
                         <div>
-                            <Label for="title">Title *</Label>
-                            <Input
-                                id="title"
-                                v-model="form.title"
-                                type="text"
-                                placeholder="Enter post title..."
-                                :class="['mt-1', { 'border-destructive': form.errors.title }]"
-                                required
-                            />
-                            <InputError :message="form.errors.title" />
+                            <Label for="title">Title</Label>
+                            <Input id="title" v-model="form.title" type="text" class="mt-1" required />
+                            <InputError class="mt-2" :message="form.errors.title" />
                         </div>
 
                         <!-- Slug -->
                         <div>
                             <Label for="slug">Slug</Label>
-                            <Input
-                                id="slug"
-                                v-model="form.slug"
-                                placeholder="Auto-generated from title"
-                                :class="['mt-1', { 'border-destructive': form.errors.slug }]"
-                            />
+                            <Input id="slug" v-model="form.slug" type="text" class="mt-1" />
                             <p class="mt-1 text-sm text-muted-foreground">Leave empty to auto-generate from title</p>
-                            <InputError :message="form.errors.slug" />
+                            <InputError class="mt-2" :message="form.errors.slug" />
                         </div>
 
                         <!-- Excerpt -->
                         <div>
                             <Label for="excerpt">Excerpt</Label>
-                            <Textarea
-                                id="excerpt"
-                                v-model="form.excerpt"
-                                placeholder="Brief description of the post..."
-                                rows="3"
-                                :class="['mt-1', { 'border-destructive': form.errors.excerpt }]"
-                            />
-                            <InputError :message="form.errors.excerpt" />
+                            <Textarea id="excerpt" v-model="form.excerpt" rows="3" class="mt-1" placeholder="Brief description of the post..." />
+                            <InputError class="mt-2" :message="form.errors.excerpt" />
                         </div>
                     </div>
 
@@ -114,75 +100,74 @@ function submit() {
                                         <SelectContent>
                                             <SelectItem value="draft">Draft</SelectItem>
                                             <SelectItem value="published">Published</SelectItem>
-                                            <SelectItem value="archived">Archived</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <InputError :message="form.errors.status" />
+                                    <InputError class="mt-2" :message="form.errors.status" />
                                 </div>
 
                                 <!-- Published At (only show if published) -->
-                                <div>
-                                    <Label for="published_at">Publish Date</Label>
-                                    <Input
-                                        id="published_at"
-                                        v-model="form.published_at"
-                                        type="datetime-local"
-                                        :class="['mt-1', { 'border-destructive': form.errors.published_at }]"
-                                    />
-                                    <InputError :message="form.errors.published_at" />
+                                <div v-if="form.status === 'published'">
+                                    <Label for="published_at">Published At</Label>
+                                    <Input id="published_at" v-model="form.published_at" type="datetime-local" class="mt-1" />
+                                    <InputError class="mt-2" :message="form.errors.published_at" />
                                 </div>
 
                                 <!-- Category -->
                                 <div>
-                                    <Label for="blog_category_id">Category *</Label>
+                                    <Label for="category">Category</Label>
                                     <Select v-model="form.blog_category_id">
                                         <SelectTrigger class="mt-1">
-                                            <SelectValue placeholder="Select category" />
+                                            <SelectValue placeholder="Select a category" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem v-for="category in categories" :key="category.id" :value="category.id.toString()">
+                                            <SelectItem v-for="category in categories" :key="category.id" :value="String(category.id)">
                                                 {{ category.name }}
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <InputError :message="form.errors.blog_category_id" />
+                                    <InputError class="mt-2" :message="form.errors.blog_category_id" />
                                 </div>
 
+                                <!-- Featured Image -->
                                 <div>
                                     <Label for="featured_image">Featured Image URL</Label>
                                     <Input
                                         id="featured_image"
                                         v-model="form.featured_image"
+                                        type="url"
+                                        class="mt-1"
                                         placeholder="https://example.com/image.jpg"
-                                        :class="['mt-1', { 'border-destructive': form.errors.featured_image }]"
                                     />
-                                    <InputError :message="form.errors.featured_image" />
+                                    <InputError class="mt-2" :message="form.errors.featured_image" />
                                 </div>
                             </CardContent>
                         </Card>
                     </div>
                 </div>
 
+                <!-- Content -->
                 <div>
-                    <Label for="content">Content *</Label>
+                    <Label for="content">Content</Label>
                     <Textarea
                         id="content"
                         v-model="form.content"
-                        placeholder="Write your post content here..."
                         rows="12"
-                        :class="['mt-1', { 'border-destructive': form.errors.content }]"
+                        class="mt-1"
+                        placeholder="Write your blog post content here..."
                         required
                     />
-                    <InputError :message="form.errors.content" />
+                    <InputError class="mt-2" :message="form.errors.content" />
                 </div>
 
                 <!-- Actions -->
-                <div class="flex justify-between border-t pt-6">
-                    <Button type="button" variant="outline" :href="blog.posts.index()"> Cancel </Button>
-
+                <div class="flex items-center justify-between">
+                    <Button type="button" variant="outline" as-child>
+                        <Link :href="blog.posts.show(post).url">Cancel</Link>
+                    </Button>
                     <Button type="submit" :disabled="form.processing">
                         <Icon v-if="form.processing" name="loader-2" class="mr-2 h-4 w-4 animate-spin" />
-                        Create Post
+                        <Icon v-else name="save" class="mr-2 h-4 w-4" />
+                        {{ form.processing ? 'Updating...' : 'Update Post' }}
                     </Button>
                 </div>
             </form>

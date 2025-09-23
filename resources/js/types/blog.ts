@@ -12,6 +12,7 @@ export interface BlogPost {
     views_count: number;
     reading_time: number;
     user_id?: number; // ID пользователя для проверки прав доступа
+    blog_category_id?: number; // ID категории для формы редактирования
     user: {
         id: number;
         name: string;
@@ -70,6 +71,11 @@ export interface BlogPostsIndexProps {
 }
 
 export interface BlogPostsCreateProps {
+    categories: BlogCategory[];
+}
+
+export interface BlogPostsEditProps {
+    post: BlogPost;
     categories: BlogCategory[];
 }
 
