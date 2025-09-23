@@ -109,7 +109,7 @@ function formatDate(dateString: string | null): string {
 <style>
 /* Custom styles for the article content */
 .prose {
-    @apply text-foreground;
+    color: var(--color-foreground);
 }
 
 .prose h1,
@@ -118,22 +118,29 @@ function formatDate(dateString: string | null): string {
 .prose h4,
 .prose h5,
 .prose h6 {
-    @apply text-foreground;
+    color: var(--color-foreground);
 }
 
 .prose a {
-    @apply text-primary hover:text-primary/80;
+    color: var(--color-primary);
+    &:hover {
+        opacity: 0.8;
+    }
 }
 
 .prose blockquote {
-    @apply border-l-primary text-muted-foreground;
+    border-left-color: var(--color-primary);
+    color: var(--color-muted-foreground);
 }
 
 .prose code {
-    @apply rounded bg-muted px-1 py-0.5 text-sm;
+    background-color: var(--color-muted);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
 }
 
 .prose pre {
-    @apply bg-muted;
+    background-color: var(--color-muted);
 }
 </style>

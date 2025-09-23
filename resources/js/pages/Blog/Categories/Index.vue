@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import Icon from '@/components/Icon.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -7,8 +6,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import blog from '@/routes/blog';
-import { router } from '@inertiajs/vue3';
 import { type BreadcrumbItem } from '@/types';
+import { router } from '@inertiajs/vue3';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -46,7 +45,7 @@ function deleteCategory(category: BlogCategory) {
 
 <template>
     <Head title="Dashboard" />
-    
+
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
             <div class="mb-8 flex items-center justify-between">
