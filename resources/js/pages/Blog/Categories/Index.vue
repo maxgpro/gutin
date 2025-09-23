@@ -14,6 +14,10 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Dashboard',
         href: dashboard().url,
     },
+    {
+        title: 'Blog Categories',
+        href: blog.categories.index().url,
+    },
 ];
 
 interface BlogCategory {

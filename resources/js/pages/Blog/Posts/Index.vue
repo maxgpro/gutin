@@ -19,6 +19,10 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Dashboard',
         href: dashboard().url,
     },
+    {
+        title: 'Blog Posts',
+        href: blog.posts.index().url,
+    },
 ];
 
 const props = defineProps<BlogPostsIndexProps>();
