@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import BlogPostCard from '@/components/BlogPostCard.vue';
 import Icon from '@/components/Icon.vue';
+import LaravelPaginationAdapter from '@/components/LaravelPaginationAdapter.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import LaravelPaginationAdapter from '@/components/LaravelPaginationAdapter.vue';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import blog from '@/routes/blog';
 import { type BreadcrumbItem } from '@/types';
 import type { BlogPostsIndexProps } from '@/types/blog';
-import { router } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 
@@ -97,9 +97,11 @@ function updateFilters() {
                         </SelectContent>
                     </Select>
 
-                    <Button v-if="$page.props.auth?.user" :href="blog.posts.create()">
-                        <Icon name="plus" class="mr-2 h-4 w-4" />
-                        New Post
+                    <Button v-if="$page.props.auth?.user" as-child>
+                        <Link :href="blog.posts.create().url">
+                            <Icon name="plus" class="mr-2 h-4 w-4" />
+                            New Post
+                        </Link>
                     </Button>
                 </div>
             </div>
@@ -112,7 +114,9 @@ function updateFilters() {
             <div v-else class="py-12 text-center">
                 <Icon name="file-text" class="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
                 <p class="text-lg text-muted-foreground">No blog posts found.</p>
-                <Button v-if="$page.props.auth?.user" :href="blog.posts.create()" class="mt-4"> Create Your First Post </Button>
+                <Button v-if="$page.props.auth?.user" as-child class="mt-4">
+                    <Link :href="blog.posts.create().url">Create Your First Post</Link>
+                </Button>
             </div>
 
             <!-- Pagination -->
