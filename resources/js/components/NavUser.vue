@@ -2,19 +2,21 @@
 import UserInfo from '@/components/UserInfo.vue';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
-import { usePage } from '@inertiajs/vue3';
-import { ChevronsUpDown } from 'lucide-vue-next';
+import { login } from '@/routes';
+import { Link, usePage } from '@inertiajs/vue3';
+import { ChevronsUpDown, LogIn } from 'lucide-vue-next';
 import UserMenuContent from './UserMenuContent.vue';
 
 const page = usePage();
-const user = page.props.auth.user;
+const user = page.props.auth?.user;
 const { isMobile, state } = useSidebar();
 </script>
 
 <template>
     <SidebarMenu>
         <SidebarMenuItem>
-            <DropdownMenu>
+            <!-- Authorized user dropdown -->
+            <DropdownMenu v-if="user">
                 <DropdownMenuTrigger as-child>
                     <SidebarMenuButton size="lg" class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
                         <UserInfo :user="user" />
@@ -30,6 +32,19 @@ const { isMobile, state } = useSidebar();
                     <UserMenuContent :user="user" />
                 </DropdownMenuContent>
             </DropdownMenu>
+
+            <!-- Login button for guests -->
+            <SidebarMenuButton v-else size="lg" as-child>
+                <Link :href="login()" class="flex items-center gap-2">
+                    <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                        <LogIn class="size-4" />
+                    </div>
+                    <div class="grid flex-1 text-left text-sm leading-tight">
+                        <span class="truncate font-medium">Войти</span>
+                        <span class="truncate text-xs text-muted-foreground">Доступ к скрытым функциям</span>
+                    </div>
+                </Link>
+            </SidebarMenuButton>
         </SidebarMenuItem>
     </SidebarMenu>
 </template>
