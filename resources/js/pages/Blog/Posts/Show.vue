@@ -30,8 +30,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const canEdit = computed(() => {
-    const user = page.props.auth?.user as { id: number } | null;
-    return user && user.id === props.post.user_id;
+    return page.props.auth?.user as { id: number } | null;
 });
 
 function formatDate(dateString: string | null): string {
@@ -77,7 +76,7 @@ function formatDate(dateString: string | null): string {
                         </span>
 
                         <!-- Edit button for author -->
-                        <Button v-if="canEdit" as-child variant="outline" size="sm">
+                        <Button v-if="canEdit" variant="outline" as-child size="sm">
                             <Link :href="blog.posts.edit(post).url">
                                 <Icon name="edit" class="mr-2 h-4 w-4" />
                                 Edit

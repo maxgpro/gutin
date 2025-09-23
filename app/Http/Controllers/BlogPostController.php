@@ -14,14 +14,20 @@ class BlogPostController extends Controller
     {
         $perPage = (int) $request->integer('per_page', 12);
 
-        $query = BlogPost::with(['user', 'category'])
-            ->latest('created_at');
+        $query = BlogPost::with(['user', 'category']);
 
         // Filter by status for admin/author view
         if ($request->has('status')) {
             $query->where('status', $request->status);
         } else {
             $query->published();
+        }
+
+        // Sort by published_at for published posts, created_at for drafts
+        if ($request->has('status') && $request->status === 'draft') {
+            $query->latest('created_at');
+        } else {
+            $query->latest('published_at');
         }
 
         // Filter by category
@@ -36,8 +42,8 @@ class BlogPostController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%")
-                  ->orWhere('excerpt', 'like', "%{$search}%");
+                    ->orWhere('content', 'like', "%{$search}%")
+                    ->orWhere('excerpt', 'like', "%{$search}%");
             });
         }
 
@@ -89,7 +95,7 @@ class BlogPostController extends Controller
     public function show(BlogPost $post)
     {
         $post->load(['user', 'category']);
-        
+
         // Increment views for published posts
         if ($post->isPublished()) {
             $post->incrementViews();

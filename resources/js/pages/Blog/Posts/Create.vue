@@ -12,7 +12,7 @@ import { dashboard } from '@/routes';
 import blog from '@/routes/blog';
 import { type BreadcrumbItem } from '@/types';
 import { type BlogPostsCreateProps } from '@/types/blog';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,6 +22,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Blog Posts',
         href: blog.posts.index().url,
+    },
+    {
+        title: 'Create',
+        href: blog.posts.create().url,
     },
 ];
 
@@ -178,7 +182,9 @@ function submit() {
 
                 <!-- Actions -->
                 <div class="flex justify-between border-t pt-6">
-                    <Button type="button" variant="outline" :href="blog.posts.index()"> Cancel </Button>
+                    <Button type="button" variant="outline" as-child>
+                        <Link :href="blog.posts.index().url">Cancel</Link>
+                    </Button>
 
                     <Button type="submit" :disabled="form.processing">
                         <Icon v-if="form.processing" name="loader-2" class="mr-2 h-4 w-4 animate-spin" />
