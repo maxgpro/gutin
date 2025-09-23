@@ -3,7 +3,7 @@ import BlogPostCard from '@/components/BlogPostCard.vue';
 import Icon from '@/components/Icon.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import LaravelPaginationAdapter from '@/components/ui/LaravelPaginationAdapter.vue';
+import LaravelPaginationAdapter from '@/components/LaravelPaginationAdapter.vue';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
@@ -31,30 +31,6 @@ const form = ref<{
     category: props.filters.category || null,
 });
 
-// Адаптируем Laravel пагинацию для Shadcn-vue
-const paginationData = computed(() => {
-    if (!props.posts.links || props.posts.links.length < 3) return null;
-
-    // Находим текущую страницу
-    const currentPageLink = props.posts.links.find((link) => link.active);
-    const currentPage = currentPageLink ? parseInt(currentPageLink.label) : 1;
-
-    // Находим общее количество страниц
-    const pageNumbers = props.posts.links.filter((link) => link.label.match(/^\d+$/)).map((link) => parseInt(link.label));
-    const totalPages = pageNumbers.length > 0 ? Math.max(...pageNumbers) : 1;
-
-    // Предположим, что у нас есть 12 постов на страницу (можно сделать это конфигурируемым)
-    const itemsPerPage = Math.ceil(props.posts.data.length) || 12;
-    const total = totalPages * itemsPerPage;
-
-    return {
-        currentPage,
-        totalPages,
-        itemsPerPage,
-        total,
-    };
-});
-
 const debouncedSearch = useDebounceFn(() => {
     updateFilters();
 }, 300);
@@ -66,33 +42,12 @@ watch(
     },
 );
 
-function navigate(url: string) {
-    router.get(
-        url,
-        {},
-        {
-            preserveState: true,
-            preserveScroll: true,
-        },
-    );
-}
-
-function goToPage(pageNumber: number) {
-    // Находим ссылку для нужной страницы в Laravel пагинации
-    const pageLink = props.posts.links.find((link) => link.label === pageNumber.toString());
-
-    if (pageLink?.url) {
-        navigate(pageLink.url);
-    }
-}
-
+// Фильтры Категорий
 const categoryModel = computed({
     // GET: что отдаём Select-у
-    get: () => form.value.category ?? '', // null → '' (Select покажет placeholder)
+    get: () => form.value.category ?? '_all', // null → '_all' (Select покажет "All Categories")
     // SET: что записываем обратно в форму
-    set: (v: string) => {
-        form.value.category = v || null;
-    }, // '' → null, иначе строка-слуг
+    set: (v: string) => form.value.category = v === '_all' ? null : v, // '_all' → null, иначе slug
 });
 
 function updateFilters() {
@@ -102,12 +57,15 @@ function updateFilters() {
         params.set('search', form.value.search);
     }
 
-    if (form.value.category) {
+    // Добавляем параметр category только если выбрана конкретная категория
+    // Если выбрано "All Categories" (_all) или null, параметр не добавляем
+    if (form.value.category && form.value.category !== '_all') {
         params.set('category', form.value.category);
     }
 
     const queryString = params.toString();
     const url = blog.posts.index().url + (queryString ? `?${queryString}` : '');
+    router.get(url, {}, { preserveState: true, replace: true });
 }
 </script>
 
@@ -123,13 +81,13 @@ function updateFilters() {
                 </div>
 
                 <div class="flex gap-2">
-                    <Select v-model="form.category">
+                    <Select v-model="categoryModel">
                         <SelectTrigger class="w-48">
                             <SelectValue placeholder="All Categories" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="_all">All Categories</SelectItem>
-                            <SelectItem v-for="category in categories" :key="category.id" :value="String(category.slug)">
+                            <SelectItem v-for="category in props.categories" :key="category.id" :value="category.slug">
                                 {{ category.name }}
                             </SelectItem>
                         </SelectContent>
@@ -154,7 +112,7 @@ function updateFilters() {
             </div>
 
             <!-- Pagination -->
-            <div v-if="paginationData && paginationData.totalPages > 1" class="mt-8">
+            <div v-if="props.posts.total > 1" class="mt-8">
                 <LaravelPaginationAdapter :total="props.posts.total" :perPage="props.posts.per_page" :currentPage="props.posts.current_page" />
             </div>
         </div>
