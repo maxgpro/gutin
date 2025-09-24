@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
 use App\Models\BlogCategory;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class BlogPostController extends Controller
 {
+    use AuthorizesRequests;
     public function index(Request $request)
     {
         $perPage = (int) $request->integer('per_page', 12);
@@ -59,6 +62,8 @@ class BlogPostController extends Controller
 
     public function create()
     {
+        $this->authorize('create', BlogPost::class);
+
         $categories = BlogCategory::where('is_active', true)->get();
 
         return Inertia::render('Blog/Posts/Create', [
@@ -68,6 +73,8 @@ class BlogPostController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', BlogPost::class);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:blog_posts',
@@ -94,6 +101,9 @@ class BlogPostController extends Controller
 
     public function show(BlogPost $post)
     {
+        // Проверяем права на просмотр поста
+        $this->authorize('view', $post);
+
         $post->load(['user', 'category']);
 
         // Increment views for published posts
@@ -112,17 +122,13 @@ class BlogPostController extends Controller
         return Inertia::render('Blog/Posts/Show', [
             'post' => $post,
             'relatedPosts' => $relatedPosts,
-            'canEdit' => (Auth::id() === $post->user_id) // автор
-                || (Auth::user()?->is_admin ?? false),   // админ
+            'canEdit' => Auth::user() ? Gate::allows('update', $post) : false,
         ]);
     }
 
     public function edit(BlogPost $post)
     {
-        // Basic authorization - only author or admin can edit
-        if ($post->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->authorize('update', $post);
 
         $categories = BlogCategory::where('is_active', true)->get();
 
@@ -134,10 +140,7 @@ class BlogPostController extends Controller
 
     public function update(Request $request, BlogPost $post)
     {
-        // Basic authorization - only author or admin can edit
-        if ($post->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->authorize('update', $post);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -163,10 +166,7 @@ class BlogPostController extends Controller
 
     public function destroy(BlogPost $post)
     {
-        // Basic authorization - only author or admin can delete
-        if ($post->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->authorize('delete', $post);
 
         $post->delete();
 

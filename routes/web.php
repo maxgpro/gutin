@@ -5,7 +5,8 @@ use Inertia\Inertia;
 use App\Http\Controllers\HhAuthController;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome');
+    // return Inertia::render('Welcome');
+    return redirect()->route('blog.posts.index');
 })->name('home');
 
 Route::get('dashboard', function () {
