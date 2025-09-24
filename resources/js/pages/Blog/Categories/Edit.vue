@@ -129,7 +129,7 @@ function submit() {
                         <!-- Submit Buttons -->
                         <div class="flex items-center justify-between border-t pt-6">
                             <Button type="button" variant="outline" as-child>
-                                <Link :href="blog.categories.show(category).url">Cancel</Link>
+                                <Link :href="blog.categories.index().url">Cancel</Link>
                             </Button>
                             <Button type="submit" :disabled="form.processing">
                                 <Icon v-if="form.processing" name="loader-2" class="mr-2 h-4 w-4 animate-spin" />

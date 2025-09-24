@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
-import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 import Placeholder from '@tiptap/extension-placeholder'
-import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
 import { Table } from '@tiptap/extension-table'
 import { TableRow } from '@tiptap/extension-table-row'
@@ -80,9 +78,9 @@ const editor = useEditor({
   content: props.modelValue,
   extensions: [
     StarterKit.configure({
-      // Disable the default codeBlock to use our custom one
+      // Disable the default codeBlock to use CodeBlockLowlight
       codeBlock: false,
-      // History is already included in StarterKit, so we don't need to add it separately
+      // History, Underline, Link — allready included in StarterKit
     }),
     CodeBlockLowlight.configure({
       lowlight,
@@ -91,12 +89,8 @@ const editor = useEditor({
     Placeholder.configure({
       placeholder: props.placeholder,
     }),
-    Underline,
     TextAlign.configure({
       types: ['heading', 'paragraph'],
-    }),
-    Link.configure({
-      openOnClick: false,
     }),
     Image,
     Table.configure({
@@ -343,7 +337,7 @@ onBeforeUnmount(() => {
         class="p-2 rounded hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         title="Undo"
       >
-        <Undo :size="20" :stroke-width="1.5" />
+        <Undo :size="20" stroke-width="1.5" />
       </button>
 
       <button
@@ -353,7 +347,7 @@ onBeforeUnmount(() => {
         class="p-2 rounded hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         title="Redo"
       >
-        <Redo :size="20" :stroke-width="1.5" />
+        <Redo :size="20" stroke-width="1.5" />
       </button>
 
       <div class="w-px h-6 bg-border mx-1"></div>
@@ -366,7 +360,7 @@ onBeforeUnmount(() => {
         class="p-2 rounded hover:bg-accent transition-colors"
         title="Bold"
       >
-        <Bold :size="20" :stroke-width="1.5" />
+        <Bold :size="20" stroke-width="1.5" />
       </button>
 
       <button
@@ -376,7 +370,7 @@ onBeforeUnmount(() => {
         class="p-2 rounded hover:bg-accent transition-colors"
         title="Italic"
       >
-        <Italic :size="20" :stroke-width="1.5" />
+        <Italic :size="20" stroke-width="1.5" />
       </button>
 
       <!-- Text Format Dropdown -->
@@ -388,11 +382,11 @@ onBeforeUnmount(() => {
           class="p-2 rounded hover:bg-accent transition-colors flex items-center gap-1"
           title="Text Format"
         >
-          <UnderlineIcon v-if="editor?.isActive('underline')" :size="20" :stroke-width="1.5" />
-          <Strikethrough v-else-if="editor?.isActive('strike')" :size="20" :stroke-width="1.5" />
-          <Code v-else-if="editor?.isActive('code')" :size="20" :stroke-width="1.5" />
-          <UnderlineIcon v-else :size="20" :stroke-width="1.5" />
-          <ChevronDown :size="16" :stroke-width="1.5" />
+          <UnderlineIcon v-if="editor?.isActive('underline')" :size="20" stroke-width="1.5" />
+          <Strikethrough v-else-if="editor?.isActive('strike')" :size="20" stroke-width="1.5" />
+          <Code v-else-if="editor?.isActive('code')" :size="20" stroke-width="1.5" />
+          <UnderlineIcon v-else :size="20" stroke-width="1.5" />
+          <ChevronDown :size="16" stroke-width="1.5" />
         </button>
         
         <!-- Text Format Dropdown Menu -->
@@ -403,7 +397,7 @@ onBeforeUnmount(() => {
             :class="{ 'bg-accent': editor?.isActive('underline') }"
             class="w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors flex items-center gap-2"
           >
-            <UnderlineIcon :size="18" :stroke-width="1.5" />
+            <UnderlineIcon :size="18" stroke-width="1.5" />
             Подчеркнутый
           </button>
           <button
@@ -412,7 +406,7 @@ onBeforeUnmount(() => {
             :class="{ 'bg-accent': editor?.isActive('strike') }"
             class="w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors flex items-center gap-2"
           >
-            <Strikethrough :size="18" :stroke-width="1.5" />
+            <Strikethrough :size="18" stroke-width="1.5" />
             Зачеркнутый
           </button>
           <button
@@ -421,7 +415,7 @@ onBeforeUnmount(() => {
             :class="{ 'bg-accent': editor?.isActive('code') }"
             class="w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors flex items-center gap-2"
           >
-            <Code :size="18" :stroke-width="1.5" />
+            <Code :size="18" stroke-width="1.5" />
             Моноширинный
           </button>
         </div>
@@ -438,11 +432,11 @@ onBeforeUnmount(() => {
           class="p-2 rounded hover:bg-accent transition-colors flex items-center gap-1"
           title="Text Style"
         >
-          <Heading1 v-if="editor?.isActive('heading', { level: 1 })"      :size="20" :stroke-width="1.5" />
-          <Heading2 v-else-if="editor?.isActive('heading', { level: 2 })" :size="20" :stroke-width="1.5" />
-          <Heading3 v-else-if="editor?.isActive('heading', { level: 3 })" :size="20" :stroke-width="1.5" />
-          <Pilcrow v-else :size="20" :stroke-width="1.5" />
-          <ChevronDown :size="16" :stroke-width="1.5" />
+          <Heading1 v-if="editor?.isActive('heading', { level: 1 })"      :size="20" stroke-width="1.5" />
+          <Heading2 v-else-if="editor?.isActive('heading', { level: 2 })" :size="20" stroke-width="1.5" />
+          <Heading3 v-else-if="editor?.isActive('heading', { level: 3 })" :size="20" stroke-width="1.5" />
+          <Pilcrow v-else :size="20" stroke-width="1.5" />
+          <ChevronDown :size="16" stroke-width="1.5" />
         </button>
         
         <!-- Headings Dropdown Menu -->
@@ -453,7 +447,7 @@ onBeforeUnmount(() => {
             :class="{ 'bg-accent': !editor?.isActive('heading') }"
             class="w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors flex items-center gap-2"
           >
-            <Pilcrow :size="18" :stroke-width="1.5" />
+            <Pilcrow :size="18" stroke-width="1.5" />
             Обычный текст
           </button>
           <div class="w-full h-px bg-border my-1"></div>
@@ -463,7 +457,7 @@ onBeforeUnmount(() => {
             :class="{ 'bg-accent': editor?.isActive('heading', { level: 1 }) }"
             class="w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors flex items-center gap-2"
           >
-            <Heading1 :size="18" :stroke-width="1.5" />
+            <Heading1 :size="18" stroke-width="1.5" />
             Heading 1
           </button>
           <button
@@ -472,7 +466,7 @@ onBeforeUnmount(() => {
             :class="{ 'bg-accent': editor?.isActive('heading', { level: 2 }) }"
             class="w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors flex items-center gap-2"
           >
-            <Heading2 :size="18" :stroke-width="1.5" />
+            <Heading2 :size="18" stroke-width="1.5" />
             Heading 2
           </button>
           <button
@@ -481,7 +475,7 @@ onBeforeUnmount(() => {
             :class="{ 'bg-accent': editor?.isActive('heading', { level: 3 }) }"
             class="w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors flex items-center gap-2"
           >
-            <Heading3 :size="18" :stroke-width="1.5" />
+            <Heading3 :size="18" stroke-width="1.5" />
             Heading 3
           </button>
         </div>
@@ -498,11 +492,11 @@ onBeforeUnmount(() => {
           class="p-2 rounded hover:bg-accent transition-colors flex items-center gap-1"
           title="Text Alignment"
         >
-          <AlignLeft v-if="!editor?.isActive({ textAlign: 'center' }) && !editor?.isActive({ textAlign: 'right' }) && !editor?.isActive({ textAlign: 'justify' })" :size="20" :stroke-width="1.5" />
-          <AlignCenter v-else-if="editor?.isActive({ textAlign: 'center' })" :size="20" :stroke-width="1.5" />
-          <AlignRight v-else-if="editor?.isActive({ textAlign: 'right' })" :size="20" :stroke-width="1.5" />
-          <AlignJustify v-else-if="editor?.isActive({ textAlign: 'justify' })" :size="20" :stroke-width="1.5" />
-          <ChevronDown :size="16" :stroke-width="1.5" />
+          <AlignLeft v-if="!editor?.isActive({ textAlign: 'center' }) && !editor?.isActive({ textAlign: 'right' }) && !editor?.isActive({ textAlign: 'justify' })" :size="20" stroke-width="1.5" />
+          <AlignCenter v-else-if="editor?.isActive({ textAlign: 'center' })" :size="20" stroke-width="1.5" />
+          <AlignRight v-else-if="editor?.isActive({ textAlign: 'right' })" :size="20" stroke-width="1.5" />
+          <AlignJustify v-else-if="editor?.isActive({ textAlign: 'justify' })" :size="20" stroke-width="1.5" />
+          <ChevronDown :size="16" stroke-width="1.5" />
         </button>
         
         <!-- Alignment Dropdown Menu -->
@@ -513,7 +507,7 @@ onBeforeUnmount(() => {
             :class="{ 'bg-accent': !editor?.isActive({ textAlign: 'center' }) && !editor?.isActive({ textAlign: 'right' }) && !editor?.isActive({ textAlign: 'justify' }) }"
             class="w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors flex items-center gap-2"
           >
-            <AlignLeft :size="18" :stroke-width="1.5" />
+            <AlignLeft :size="18" stroke-width="1.5" />
             Align Left
           </button>
           <button
@@ -522,7 +516,7 @@ onBeforeUnmount(() => {
             :class="{ 'bg-accent': editor?.isActive({ textAlign: 'center' }) }"
             class="w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors flex items-center gap-2"
           >
-            <AlignCenter :size="18" :stroke-width="1.5" />
+            <AlignCenter :size="18" stroke-width="1.5" />
             Align Center
           </button>
           <button
@@ -531,7 +525,7 @@ onBeforeUnmount(() => {
             :class="{ 'bg-accent': editor?.isActive({ textAlign: 'right' }) }"
             class="w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors flex items-center gap-2"
           >
-            <AlignRight :size="18" :stroke-width="1.5" />
+            <AlignRight :size="18" stroke-width="1.5" />
             Align Right
           </button>
           <button
@@ -540,7 +534,7 @@ onBeforeUnmount(() => {
             :class="{ 'bg-accent': editor?.isActive({ textAlign: 'justify' }) }"
             class="w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors flex items-center gap-2"
           >
-            <AlignJustify :size="18" :stroke-width="1.5" />
+            <AlignJustify :size="18" stroke-width="1.5" />
             Justify
           </button>
         </div>
@@ -556,7 +550,7 @@ onBeforeUnmount(() => {
         class="p-2 rounded hover:bg-accent transition-colors"
         title="Bullet List"
       >
-        <List :size="24" :stroke-width="1" />
+        <List :size="24" stroke-width="1" />
       </button>
 
       <button
@@ -566,7 +560,7 @@ onBeforeUnmount(() => {
         class="p-2 rounded hover:bg-accent transition-colors"
         title="Ordered List"
       >
-        <ListOrdered :size="24" :stroke-width="1" />
+        <ListOrdered :size="24" stroke-width="1" />
       </button>
 
       <div class="w-px h-6 bg-border mx-1"></div>
@@ -579,7 +573,7 @@ onBeforeUnmount(() => {
         class="p-2 rounded hover:bg-accent transition-colors"
         title="Quote"
       >
-        <Quote :size="20" :stroke-width="1" />
+        <Quote :size="20" stroke-width="1" />
       </button>
 
       <!-- Code Block with Language Selection -->
@@ -592,9 +586,7 @@ onBeforeUnmount(() => {
           title="Code Block"
         >
           <Code2 :size="24" stroke-width="1.5" />
-          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
-          </svg>
+          <ChevronDown :size="16" stroke-width="1.5" />
         </button>
         
         <!-- Language Dropdown -->
@@ -621,7 +613,7 @@ onBeforeUnmount(() => {
         class="p-2 rounded hover:bg-accent transition-colors"
         title="Add Link"
       >
-        <LinkIcon :size="20" :stroke-width="1.5" />
+        <LinkIcon :size="20" stroke-width="1.5" />
       </button>
 
       <button
@@ -631,7 +623,7 @@ onBeforeUnmount(() => {
         class="p-2 rounded hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         title="Remove Link"
       >
-        <Unlink :size="20" :stroke-width="1.5" />
+        <Unlink :size="20" stroke-width="1.5" />
       </button>
 
       <!-- Horizontal Rule -->
@@ -641,7 +633,7 @@ onBeforeUnmount(() => {
         class="p-2 rounded hover:bg-accent transition-colors"
         title="Insert Horizontal Rule"
       >
-        <Minus :size="20" :stroke-width="1.5" />
+        <Minus :size="20" stroke-width="1.5" />
       </button>
 
       <div class="w-px h-6 bg-border mx-1"></div>
@@ -653,7 +645,7 @@ onBeforeUnmount(() => {
         class="p-2 rounded hover:bg-accent transition-colors"
         title="Clear Formatting"
       >
-        <Eraser :size="20" :stroke-width="1.5" />
+        <Eraser :size="20" stroke-width="1.5" />
       </button>
     </div>
 
@@ -668,5 +660,4 @@ onBeforeUnmount(() => {
     </div>
   </div>
 </template>
-
 <!-- Стили для Tiptap вынесены в /resources/css/tiptap.css -->
