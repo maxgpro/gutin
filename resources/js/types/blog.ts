@@ -84,6 +84,7 @@ export interface BlogPostsEditProps {
 export interface BlogPostsShowProps {
     post: BlogPost;
     relatedPosts: BlogPost[];
+    canEdit: boolean;
 }
 
 export interface BlogCategoriesIndexProps {

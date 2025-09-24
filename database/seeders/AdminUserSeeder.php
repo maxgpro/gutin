@@ -29,6 +29,7 @@ class AdminUserSeeder extends Seeder
                 'password' => bcrypt('pass'),
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
+                'is_admin' => true,
             ]
         );
     }

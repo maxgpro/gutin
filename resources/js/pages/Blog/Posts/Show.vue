@@ -30,7 +30,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const canEdit = computed(() => {
-    return page.props.auth?.user as { id: number } | null;
+    return props.canEdit;
 });
 
 function formatDate(dateString: string | null): string {

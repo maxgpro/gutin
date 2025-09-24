@@ -112,6 +112,8 @@ class BlogPostController extends Controller
         return Inertia::render('Blog/Posts/Show', [
             'post' => $post,
             'relatedPosts' => $relatedPosts,
+            'canEdit' => (Auth::id() === $post->user_id) // автор
+                || (Auth::user()?->is_admin ?? false),   // админ
         ]);
     }
 
