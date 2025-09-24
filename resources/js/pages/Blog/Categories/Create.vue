@@ -25,6 +25,10 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Blog Categories',
         href: blog.categories.index().url,
     },
+    {
+        title: 'Create Category',
+        href: blog.posts.create().url,
+    },
 ];
 
 const form = useForm({

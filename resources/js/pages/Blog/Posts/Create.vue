@@ -24,7 +24,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: blog.posts.index().url,
     },
     {
-        title: 'Create',
+        title: 'Create Post',
         href: blog.posts.create().url,
     },
 ];
