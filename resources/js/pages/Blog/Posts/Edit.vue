@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import TiptapEditor from '@/components/ui/tiptap-editor.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import blog from '@/routes/blog';
@@ -108,7 +109,12 @@ function submit() {
                                 <!-- Published At (only show if published) -->
                                 <div v-if="form.status === 'published'">
                                     <Label for="published_at">Published At</Label>
-                                    <Input id="published_at" v-model="form.published_at" type="datetime-local" class="mt-1" />
+                                    <Input
+                                        id="published_at"
+                                        v-model="form.published_at"
+                                        type="datetime-local"
+                                        class="mt-1"
+                                    />
                                     <InputError class="mt-2" :message="form.errors.published_at" />
                                 </div>
 
@@ -148,14 +154,13 @@ function submit() {
                 <!-- Content -->
                 <div>
                     <Label for="content">Content</Label>
-                    <Textarea
-                        id="content"
-                        v-model="form.content"
-                        rows="12"
-                        class="mt-1"
-                        placeholder="Write your blog post content here..."
-                        required
-                    />
+                    <div class="mt-1">
+                        <TiptapEditor
+                            v-model="form.content"
+                            placeholder="Write your blog post content here..."
+                            :class="{ 'border-destructive': form.errors.content }"
+                        />
+                    </div>
                     <InputError class="mt-2" :message="form.errors.content" />
                 </div>
 
@@ -167,7 +172,7 @@ function submit() {
                     <Button type="submit" :disabled="form.processing">
                         <Icon v-if="form.processing" name="loader-2" class="mr-2 h-4 w-4 animate-spin" />
                         <Icon v-else name="save" class="mr-2 h-4 w-4" />
-                        {{ form.processing ? 'Updating...' : 'Update Post' }}
+                        {{ form.processing ? 'Updating...' : 'Update' }}
                     </Button>
                 </div>
             </form>

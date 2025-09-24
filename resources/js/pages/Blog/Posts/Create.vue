@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import TiptapEditor from '@/components/ui/tiptap-editor.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import blog from '@/routes/blog';
@@ -125,7 +126,7 @@ function submit() {
                                 </div>
 
                                 <!-- Published At (only show if published) -->
-                                <div>
+                                <div v-if="form.status === 'published'">
                                     <Label for="published_at">Publish Date</Label>
                                     <Input
                                         id="published_at"
@@ -144,7 +145,7 @@ function submit() {
                                             <SelectValue placeholder="Select category" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem v-for="category in categories" :key="category.id" :value="category.id.toString()">
+                                            <SelectItem v-for="category in props.categories" :key="category.id" :value="category.id.toString()">
                                                 {{ category.name }}
                                             </SelectItem>
                                         </SelectContent>
@@ -169,26 +170,25 @@ function submit() {
 
                 <div>
                     <Label for="content">Content *</Label>
-                    <Textarea
-                        id="content"
-                        v-model="form.content"
-                        placeholder="Write your post content here..."
-                        rows="12"
-                        :class="['mt-1', { 'border-destructive': form.errors.content }]"
-                        required
-                    />
+                    <div class="mt-1">
+                        <TiptapEditor
+                            v-model="form.content"
+                            placeholder="Write your post content here..."
+                            :class="{ 'border-destructive': form.errors.content }"
+                        />
+                    </div>
                     <InputError :message="form.errors.content" />
                 </div>
 
                 <!-- Actions -->
-                <div class="flex justify-between border-t pt-6">
+                <div class="flex justify-between">
                     <Button type="button" variant="outline" as-child>
                         <Link :href="blog.posts.index().url">Cancel</Link>
                     </Button>
-
                     <Button type="submit" :disabled="form.processing">
                         <Icon v-if="form.processing" name="loader-2" class="mr-2 h-4 w-4 animate-spin" />
-                        Create Post
+                        <Icon v-else name="save" class="mr-2 h-4 w-4" />
+                        {{ form.processing ? 'Creating...' : 'Create' }}
                     </Button>
                 </div>
             </form>

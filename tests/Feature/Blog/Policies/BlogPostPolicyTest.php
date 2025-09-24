@@ -14,7 +14,8 @@ beforeEach(function () {
     $this->post = BlogPost::factory()->create([
         'user_id' => $this->user->id,
         'blog_category_id' => $this->category->id,
-        'status' => 'published'
+        'status' => 'published',
+        'published_at' => now()
     ]);
 });
 

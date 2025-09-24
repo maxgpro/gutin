@@ -92,8 +92,8 @@ function formatDate(dateString: string | null): string {
             </div>
 
             <!-- Article Content -->
-            <article class="prose prose-lg mb-12 max-w-none">
-                <div v-html="post.content"></div>
+            <article class="prose prose-lg mb-12 max-w-none prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground">
+                <div v-html="post.content" class="tiptap-content"></div>
             </article>
 
             <!-- Related Posts -->
@@ -144,4 +144,9 @@ function formatDate(dateString: string | null): string {
 .prose pre {
     background-color: var(--color-muted);
 }
+
+/* 
+ * Стили для отображения контента Tiptap вынесены в /resources/css/tiptap.css
+ * Все стили теперь централизованы и применяются через класс .tiptap-content
+ */
 </style>
