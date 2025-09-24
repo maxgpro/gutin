@@ -32,5 +32,19 @@ class AdminUserSeeder extends Seeder
                 'is_admin' => true,
             ]
         );
+
+        User::updateOrCreate(
+            [
+                'email' => 'tester@example.com'
+            ],
+            [
+                'name' => 'Tester',
+                'email' => 'tester@example.com',
+                'password' => bcrypt('pass'),
+                'email_verified_at' => now(),
+                'remember_token' => Str::random(10),
+                'is_admin' => false,
+            ]
+        );
     }
 }
