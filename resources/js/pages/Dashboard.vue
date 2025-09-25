@@ -20,6 +20,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
             <div class="grid auto-rows-min gap-4 md:grid-cols-3">
                 <a
+                    v-if="$page.props.auth.canAccessHh"
                     href="/hh/oauth/redirect"
                     target="_blank"
                     rel="noopener"
@@ -27,6 +28,9 @@ const breadcrumbs: BreadcrumbItem[] = [
                 >
                     Войти через hh.ru
                 </a>
+                <div v-else class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                    <PlaceholderPattern />
+                </div>
                 <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                     <PlaceholderPattern />
                 </div>

@@ -21,7 +21,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'is_admin',
     ];
 
     /**
@@ -44,7 +43,6 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_admin' => 'boolean',
         ];
     }
     
@@ -60,5 +58,35 @@ class User extends Authenticatable
     public function publishedBlogPosts()
     {
         return $this->blogPosts()->published();
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_roles');
+    }
+
+    public function hasRole(string $role): bool
+    {
+        return $this->roles()->where('name', $role)->exists();
+    }
+
+    public function hasAnyRole(array $roles): bool
+    {
+        return $this->roles()->whereIn('name', $roles)->exists();
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole(Role::ADMIN);
+    }
+
+    public function isMentee(): bool
+    {
+        return $this->hasRole(Role::MENTEE);
+    }
+
+    public function canAccessHh(): bool
+    {
+        return $this->isMentee() || $this->isAdmin();
     }
 }

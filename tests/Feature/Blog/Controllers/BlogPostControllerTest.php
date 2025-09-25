@@ -9,8 +9,8 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->category = BlogCategory::factory()->create();
-    $this->user = User::factory()->create(['is_admin' => false]);
-    $this->admin = User::factory()->create(['is_admin' => true]);
+    $this->user = User::factory()->create();
+    $this->admin = User::factory()->admin()->create();
 });
 
 test('regular user cannot access create post page', function () {
@@ -86,7 +86,7 @@ test('admin can delete any post', function () {
 });
 
 test('other user cannot delete post', function () {
-    $otherUser = User::factory()->create(['is_admin' => false]);
+    $otherUser = User::factory()->create();
     $post = BlogPost::factory()->create([
         'user_id' => $this->user->id,
         'blog_category_id' => $this->category->id

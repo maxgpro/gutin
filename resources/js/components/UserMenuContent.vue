@@ -12,7 +12,11 @@ interface Props {
 }
 
 const handleLogout = () => {
-    router.flushAll();
+    router.post(logout().url, {}, {
+        onSuccess: () => {
+            // Redirect будет обработан автоматически сервером
+        }
+    });
 };
 
 defineProps<Props>();
@@ -34,10 +38,10 @@ defineProps<Props>();
         </DropdownMenuItem>
     </DropdownMenuGroup>
     <DropdownMenuSeparator />
-    <DropdownMenuItem :as-child="true">
-        <Link class="block w-full" :href="logout()" @click="handleLogout" as="button">
+    <DropdownMenuItem as-child>
+        <button @click="handleLogout" class="w-full text-left">
             <LogOut class="mr-2 h-4 w-4" />
             Log out
-        </Link>
+        </button>
     </DropdownMenuItem>
 </template>

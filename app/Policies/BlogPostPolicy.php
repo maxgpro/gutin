@@ -38,13 +38,13 @@ class BlogPostPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(?User $user): bool
     {
         // Авторизованные пользователи могут создавать посты
         // return true;
 
         // Только админы могут создавать посты
-        return $user->is_admin;
+        return $user?->isAdmin() ?? false;
     }
 
     /**
@@ -68,7 +68,7 @@ class BlogPostPolicy
      */
     public function restore(User $user, BlogPost $blogPost): bool
     {
-        return $user->is_admin;
+        return $user->isAdmin();
     }
 
     /**
@@ -76,7 +76,7 @@ class BlogPostPolicy
      */
     public function forceDelete(User $user, BlogPost $blogPost): bool
     {
-        return $user->is_admin;
+        return $user->isAdmin();
     }
 
     /**
@@ -84,6 +84,6 @@ class BlogPostPolicy
      */
     private function isAuthorOrAdmin(User $user, BlogPost $blogPost): bool
     {
-        return $user->id === $blogPost->user_id || $user->is_admin;
+        return $user->id === $blogPost->user_id || $user->isAdmin();
     }
 }

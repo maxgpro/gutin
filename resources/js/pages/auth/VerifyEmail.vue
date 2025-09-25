@@ -4,8 +4,16 @@ import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { logout } from '@/routes';
-import { Form, Head } from '@inertiajs/vue3';
+import { Form, Head, router } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+
+const handleLogout = () => {
+    router.post(logout().url, {}, {
+        onSuccess: () => {
+            // Redirect будет обработан автоматически сервером
+        }
+    });
+};
 
 defineProps<{
     status?: string;
@@ -26,7 +34,7 @@ defineProps<{
                 Resend verification email
             </Button>
 
-            <TextLink :href="logout()" as="button" class="mx-auto block text-sm"> Log out </TextLink>
+            <button @click="handleLogout" class="mx-auto block text-sm text-blue-600 hover:text-blue-500"> Log out </button>
         </Form>
     </AuthLayout>
 </template>

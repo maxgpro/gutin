@@ -5,7 +5,7 @@ use App\Models\BlogPost;
 use App\Models\User;
 
 beforeEach(function () {
-    $this->admin = User::factory()->create(['is_admin' => true]);
+    $this->admin = User::factory()->admin()->create();
     $this->category = BlogCategory::factory()->create();
 });
 

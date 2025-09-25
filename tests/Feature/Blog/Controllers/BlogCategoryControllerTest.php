@@ -7,8 +7,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->user = User::factory()->create(['is_admin' => false]);
-    $this->admin = User::factory()->create(['is_admin' => true]);
+    $this->user = User::factory()->create();
+    $this->admin = User::factory()->admin()->create();
     $this->category = BlogCategory::factory()->create();
 });
 

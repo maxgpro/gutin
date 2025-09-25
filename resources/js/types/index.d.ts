@@ -3,6 +3,9 @@ import type { LucideIcon } from 'lucide-vue-next';
 
 export interface Auth {
     user: User;
+    canAccessHh: boolean;
+    canCreateBlogPosts: boolean;
+    canCreateBlogCategories: boolean;
 }
 
 export interface BreadcrumbItem {

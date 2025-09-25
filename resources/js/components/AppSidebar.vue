@@ -7,33 +7,51 @@ import { dashboard } from '@/routes';
 import blog from '@/routes/blog';
 import hh from '@/routes/hh';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { BookOpen, FileText, Folder, LayoutGrid, LogIn, Tag } from 'lucide-vue-next';
+import { computed } from 'vue';
 import AppLogo from './AppLogo.vue';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Blog Posts',
-        href: blog.posts.index(),
-        icon: FileText,
-    },
-    {
-        title: 'Blog Categories',
-        href: blog.categories.index(),
-        icon: Tag,
-    },
-    {
-        title: 'Войти через hh.ru',
-        href: hh.redirect.url(),
-        icon: LogIn,
-        external: true,
-    },
-];
+const page = usePage();
+
+const mainNavItems = computed(() => {
+    const items: NavItem[] = [];
+
+    // Категории показываем только тем, кто может их создавать (админы)
+    if (page.props.auth?.canCreateBlogCategories) {
+        items.push(
+        {
+            title: 'Blog Categories',
+            href: blog.categories.index(),
+            icon: Tag,
+        });
+    }
+
+    // Блог посты доступны всем
+    items.push(
+        {
+            title: 'Blog Posts',
+            href: blog.posts.index(),
+            icon: FileText,
+        });
+
+    // Добавляем пункт HH только для пользователей с доступом
+    if (page.props.auth?.canAccessHh) {
+        items.push(
+        {
+            title: 'Dashboard',
+            href: dashboard(),
+            icon: LayoutGrid,
+        },{
+            title: 'Войти через hh.ru',
+            href: hh.redirect.url(),
+            icon: LogIn,
+            external: true,
+        });
+    }
+
+    return items;
+});
 
 const footerNavItems: NavItem[] = [
     {

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -44,8 +45,20 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
+                'canAccessHh' => $request->user()?->canAccessHh() ?? false,
+                'canCreateBlogPosts' => $this->canCreate(\App\Models\BlogPost::class),
+                'canCreateBlogCategories' => $this->canCreate(\App\Models\BlogCategory::class),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
+    }
+
+    private function canCreate(string $modelClass): bool
+    {
+        try {
+            return Auth::check() && \Illuminate\Support\Facades\Gate::allows('create', $modelClass);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

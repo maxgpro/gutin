@@ -9,7 +9,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 
 describe('Permission Based UI', function () {
     it('shows create button to admin on categories index', function () {
-        $admin = User::factory()->create(['is_admin' => true]);
+        $admin = User::factory()->admin()->create();
 
         $this->actingAs($admin)
             ->get(route('blog.categories.index'))
@@ -22,7 +22,7 @@ describe('Permission Based UI', function () {
     });
 
     it('hides create button from regular user on categories index', function () {
-        $user = User::factory()->create(['is_admin' => false]);
+        $user = User::factory()->create();
 
         $this->actingAs($user)
             ->get(route('blog.categories.index'))
@@ -45,7 +45,7 @@ describe('Permission Based UI', function () {
     });
 
     it('shows create button to admin on posts index', function () {
-        $admin = User::factory()->create(['is_admin' => true]);
+        $admin = User::factory()->admin()->create();
 
         $this->actingAs($admin)
             ->get(route('blog.posts.index'))
@@ -58,7 +58,7 @@ describe('Permission Based UI', function () {
     });
 
     it('hides create button from regular user on posts index', function () {
-        $user = User::factory()->create(['is_admin' => false]);
+        $user = User::factory()->create();
 
         $this->actingAs($user)
             ->get(route('blog.posts.index'))

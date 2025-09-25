@@ -9,8 +9,8 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->category = BlogCategory::factory()->create();
-    $this->user = User::factory()->create(['is_admin' => false]);
-    $this->admin = User::factory()->create(['is_admin' => true]);
+    $this->user = User::factory()->create();
+    $this->admin = User::factory()->admin()->create();
     $this->post = BlogPost::factory()->create([
         'user_id' => $this->user->id,
         'blog_category_id' => $this->category->id,
@@ -36,7 +36,7 @@ test('admin can update any post', function () {
 });
 
 test('other user cannot update post', function () {
-    $otherUser = User::factory()->create(['is_admin' => false]);
+    $otherUser = User::factory()->create();
     $this->assertFalse($otherUser->can('update', $this->post));
 });
 
@@ -49,7 +49,7 @@ test('admin can delete any post', function () {
 });
 
 test('other user cannot delete post', function () {
-    $otherUser = User::factory()->create(['is_admin' => false]);
+    $otherUser = User::factory()->create();
     $this->assertFalse($otherUser->can('delete', $this->post));
 });
 

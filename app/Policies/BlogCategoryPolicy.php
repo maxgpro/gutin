@@ -28,16 +28,16 @@ class BlogCategoryPolicy
         }
 
         // Неактивные категории могут видеть только админы
-        return $user && $user->is_admin;
+        return $user && $user->isAdmin();
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(?User $user): bool
     {
         // Только админы могут создавать категории
-        return $user->is_admin;
+        return $user?->isAdmin() ?? false;
     }
 
     /**
@@ -46,7 +46,7 @@ class BlogCategoryPolicy
     public function update(User $user, BlogCategory $blogCategory): bool
     {
         // Только админы могут редактировать категории
-        return $user->is_admin;
+        return $user->isAdmin();
     }
 
     /**
@@ -55,7 +55,7 @@ class BlogCategoryPolicy
     public function delete(User $user, BlogCategory $blogCategory): bool
     {
         // Только админы могут удалять категории
-        return $user->is_admin;
+        return $user->isAdmin();
     }
 
     /**
@@ -63,7 +63,7 @@ class BlogCategoryPolicy
      */
     public function restore(User $user, BlogCategory $blogCategory): bool
     {
-        return $user->is_admin;
+        return $user->isAdmin();
     }
 
     /**
@@ -71,6 +71,6 @@ class BlogCategoryPolicy
      */
     public function forceDelete(User $user, BlogCategory $blogCategory): bool
     {
-        return $user->is_admin;
+        return $user->isAdmin();
     }
 }

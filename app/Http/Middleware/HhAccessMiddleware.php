@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminMiddleware
+class HhAccessMiddleware
 {
     /**
      * Handle an incoming request.
@@ -17,11 +17,15 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
         /** @var User|null $user */
         $user = Auth::user();
-        
-        if (!Auth::check() || !$user || !$user->isAdmin()) {
-            abort(403, 'Access denied.');
+
+        if (!$user || !$user->canAccessHh()) {
+            abort(403, 'У вас нет доступа к функциям HeadHunter');
         }
 
         return $next($request);

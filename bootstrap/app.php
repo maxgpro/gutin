@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'hh.auth' => EnsureHhToken::class,
+            'hh.access' => \App\Http\Middleware\HhAccessMiddleware::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
     })
