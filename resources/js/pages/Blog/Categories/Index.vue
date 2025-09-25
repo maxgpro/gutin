@@ -40,7 +40,7 @@ function deleteCategory(category: BlogCategory) {
     <Head title="Dashboard" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             <div class="mb-8 flex items-center justify-between">
                 <Button v-if="canCreate" as-child>
                     <Link :href="blog.categories.create().url">

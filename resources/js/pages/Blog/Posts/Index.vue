@@ -80,12 +80,15 @@ function updateFilters() {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             <!-- Filters and Search -->
-            <div class="mb-6 flex flex-col gap-4 md:flex-row">
-                <div class="flex-1">
-                    <Input v-model="form.search" placeholder="Search posts..." class="max-w-md" @input="debouncedSearch" />
-                </div>
-
-                <div class="flex gap-2">
+            <div class="mb-6 flex flex-col gap-2 md:flex-row">
+                <div class="flex gap-2 order-2 md:order-1">
+                    <Button v-if="canCreate" as-child>
+                        <Link :href="blog.posts.create().url">
+                            <Icon name="plus" class="h-4 w-4" />
+                            Post
+                        </Link>
+                    </Button>
+                    
                     <Select v-model="categoryModel">
                         <SelectTrigger class="w-48">
                             <SelectValue placeholder="All Categories" />
@@ -97,13 +100,15 @@ function updateFilters() {
                             </SelectItem>
                         </SelectContent>
                     </Select>
+                </div>
 
-                    <Button v-if="canCreate" as-child>
-                        <Link :href="blog.posts.create().url">
-                            <Icon name="plus" class="h-4 w-4" />
-                            Post
-                        </Link>
-                    </Button>
+                <div class="flex w-full order-1 md:order-2">
+                    <Input
+                        v-model="form.search"
+                        placeholder="Search posts..."
+                        class="min-w-md"
+                        @input="debouncedSearch"
+                    />
                 </div>
             </div>
 
