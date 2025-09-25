@@ -84,3 +84,6 @@ When working with this codebase, prioritize type safety, follow the established 
 ## User Instructions
 
 Use shandcn-iu firstly then create custom components. Use Tailwind CSS v4 for styling. Use TypeScript for all new code. Follow existing code patterns for consistency.
+
+# Tests
+This project includes a comprehensive suite of tests to ensure the reliability and correctness of the blog features, including controllers, policies, middleware, and integrations. Below is an overview of the test structure, how to run them, and key features covered. Make tests for new features.
