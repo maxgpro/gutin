@@ -26,6 +26,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const props = defineProps<BlogPostsIndexProps>();
+const { canCreate } = props;
 
 const form = ref<{
     search: string;
@@ -97,10 +98,10 @@ function updateFilters() {
                         </SelectContent>
                     </Select>
 
-                    <Button v-if="$page.props.auth?.user" as-child>
+                    <Button v-if="canCreate" as-child>
                         <Link :href="blog.posts.create().url">
-                            <Icon name="plus" class="mr-2 h-4 w-4" />
-                            New Post
+                            <Icon name="plus" class="h-4 w-4" />
+                            Post
                         </Link>
                     </Button>
                 </div>
@@ -114,7 +115,7 @@ function updateFilters() {
             <div v-else class="py-12 text-center">
                 <Icon name="file-text" class="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
                 <p class="text-lg text-muted-foreground">No blog posts found.</p>
-                <Button v-if="$page.props.auth?.user" as-child class="mt-4">
+                <Button v-if="canCreate" as-child class="mt-4">
                     <Link :href="blog.posts.create().url">Create Your First Post</Link>
                 </Button>
             </div>

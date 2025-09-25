@@ -22,6 +22,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const props = defineProps<BlogCategoriesIndexProps>();
+const { canCreate } = props;
 
 function deleteCategory(category: BlogCategory) {
     if ((category.posts_count || 0) > 0) {
@@ -41,10 +42,10 @@ function deleteCategory(category: BlogCategory) {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
             <div class="mb-8 flex items-center justify-between">
-                <Button v-if="$page.props.auth?.user" as-child>
+                <Button v-if="canCreate" as-child>
                     <Link :href="blog.categories.create().url">
-                        <Icon name="plus" class="mr-2 h-4 w-4" />
-                        New Category
+                        <Icon name="plus" class="h-4 w-4" />
+                        Category
                     </Link>
                 </Button>
             </div>
@@ -60,9 +61,9 @@ function deleteCategory(category: BlogCategory) {
                         </div>
 
                         <h3 class="mb-2 text-xl font-semibold">
-                            <TextLink :href="blog.categories.show(category)" class="hover:text-primary">
+                            <!-- <TextLink :href="blog.categories.show(category)" class="hover:text-primary"> -->
                                 {{ category.name }}
-                            </TextLink>
+                            <!-- </TextLink> -->
                         </h3>
 
                         <p v-if="category.description" class="mb-4 text-muted-foreground">

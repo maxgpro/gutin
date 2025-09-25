@@ -8,11 +8,11 @@ import { dashboard } from '@/routes';
 import blog from '@/routes/blog';
 import { type BreadcrumbItem } from '@/types';
 import { type BlogPostsShowProps } from '@/types/blog';
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { SquarePen, Trash2 } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 const props = defineProps<BlogPostsShowProps>();
-const page = usePage();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -33,6 +33,10 @@ const canEdit = computed(() => {
     return props.canEdit;
 });
 
+const canDelete = computed(() => {
+    return props.canDelete;
+});
+
 function formatDate(dateString: string | null): string {
     if (!dateString) return '';
 
@@ -42,6 +46,12 @@ function formatDate(dateString: string | null): string {
         month: 'long',
         day: 'numeric',
     });
+}
+
+function deletePost() {
+    if (confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+        router.delete(blog.posts.destroy(props.post).url);
+    }
 }
 </script>
 
@@ -75,12 +85,18 @@ function formatDate(dateString: string | null): string {
                             {{ post.views_count }} views
                         </span>
 
-                        <!-- Edit button for author -->
+                        <!-- Edit button for author/admin -->
                         <Button v-if="canEdit" variant="outline" as-child size="sm">
                             <Link :href="blog.posts.edit(post).url">
-                                <Icon name="edit" class="mr-2 h-4 w-4" />
+                                <SquarePen :size="20" stroke-width="1.5" class="mr-2" />
                                 Edit
                             </Link>
+                        </Button>
+
+                        <!-- Delete button for author/admin -->
+                        <Button v-if="canDelete" variant="destructive" size="sm" @click="deletePost">
+                            <Trash2 :size="20" stroke-width="1.5" class="mr-2" />
+                            Delete
                         </Button>
                     </div>
                 </div>
@@ -92,7 +108,9 @@ function formatDate(dateString: string | null): string {
             </div>
 
             <!-- Article Content -->
-            <article class="prose prose-lg mb-12 max-w-none prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground">
+            <article
+                class="prose prose-lg prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground mb-12 max-w-none"
+            >
                 <div v-html="post.content" class="tiptap-content"></div>
             </article>
 

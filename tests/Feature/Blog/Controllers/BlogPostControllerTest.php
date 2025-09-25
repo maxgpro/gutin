@@ -56,3 +56,60 @@ test('admin can create post', function () {
         'user_id' => $this->admin->id
     ]);
 });
+
+test('author can delete their own post', function () {
+    $post = BlogPost::factory()->create([
+        'user_id' => $this->user->id,
+        'blog_category_id' => $this->category->id
+    ]);
+
+    $response = $this->actingAs($this->user)->delete(route('blog.posts.destroy', $post));
+    $response->assertRedirect(route('blog.posts.index'));
+
+    $this->assertDatabaseMissing('blog_posts', [
+        'id' => $post->id
+    ]);
+});
+
+test('admin can delete any post', function () {
+    $post = BlogPost::factory()->create([
+        'user_id' => $this->user->id,
+        'blog_category_id' => $this->category->id
+    ]);
+
+    $response = $this->actingAs($this->admin)->delete(route('blog.posts.destroy', $post));
+    $response->assertRedirect(route('blog.posts.index'));
+
+    $this->assertDatabaseMissing('blog_posts', [
+        'id' => $post->id
+    ]);
+});
+
+test('other user cannot delete post', function () {
+    $otherUser = User::factory()->create(['is_admin' => false]);
+    $post = BlogPost::factory()->create([
+        'user_id' => $this->user->id,
+        'blog_category_id' => $this->category->id
+    ]);
+
+    $response = $this->actingAs($otherUser)->delete(route('blog.posts.destroy', $post));
+    $response->assertStatus(403);
+
+    $this->assertDatabaseHas('blog_posts', [
+        'id' => $post->id
+    ]);
+});
+
+test('guest cannot delete post', function () {
+    $post = BlogPost::factory()->create([
+        'user_id' => $this->user->id,
+        'blog_category_id' => $this->category->id
+    ]);
+
+    $response = $this->delete(route('blog.posts.destroy', $post));
+    $response->assertRedirect(route('login'));
+
+    $this->assertDatabaseHas('blog_posts', [
+        'id' => $post->id
+    ]);
+});

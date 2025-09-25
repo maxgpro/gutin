@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\BlogCategory;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class BlogCategoryController extends Controller
@@ -20,12 +22,14 @@ class BlogCategoryController extends Controller
 
         return Inertia::render('Blog/Categories/Index', [
             'categories' => $categories,
+            'canCreate' => Auth::user() ? Gate::allows('create', BlogCategory::class) : false,
         ]);
     }
 
     public function create()
     {
-        // Админский middleware уже проверил права
+        $this->authorize('create', BlogCategory::class);
+        
         return Inertia::render('Blog/Categories/Create');
     }
 
@@ -86,7 +90,8 @@ class BlogCategoryController extends Controller
 
     public function destroy(BlogCategory $category)
     {
-        // Админский middleware уже проверил права
+        $this->authorize('delete', $category);
+        
         if ($category->posts()->count() > 0) {
             return back()->with('error', 'Cannot delete category with existing posts.');
         }

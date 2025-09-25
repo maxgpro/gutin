@@ -70,6 +70,7 @@ export interface BlogPostsIndexProps {
     posts: LaravelPagination<BlogPost>;
     categories: BlogCategory[];
     filters: BlogFilters;
+    canCreate: boolean;
 }
 
 export interface BlogPostsCreateProps {
@@ -85,10 +86,12 @@ export interface BlogPostsShowProps {
     post: BlogPost;
     relatedPosts: BlogPost[];
     canEdit: boolean;
+    canDelete: boolean;
 }
 
 export interface BlogCategoriesIndexProps {
     categories: BlogCategory[];
+    canCreate: boolean;
 }
 
 export interface BlogCategoriesCreateProps {

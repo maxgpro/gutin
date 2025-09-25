@@ -15,10 +15,19 @@ test('admin middleware allows admin access', function () {
     $response->assertStatus(200);
 });
 
-test('admin middleware blocks regular user', function () {
+test('admin middleware blocks regular user from admin-only routes', function () {
+    $category = \App\Models\BlogCategory::factory()->create();
+    
+    // Проверяем маршрут который действительно защищен admin middleware
+    $response = $this->actingAs($this->user)->get(route('blog.categories.edit', $category));
+    $response->assertStatus(403);
+});
+
+test('policy blocks regular user from category creation', function () {
+    // Этот маршрут теперь под auth middleware, но политика блокирует обычных пользователей
     $response = $this->actingAs($this->user)->get(route('blog.categories.create'));
     $response->assertStatus(403);
-    $response->assertSeeText('Access denied. Admin rights required.');
+    // Политика выбрасывает стандартную ошибку авторизации, не кастомное сообщение middleware
 });
 
 test('admin middleware redirects guest to login', function () {

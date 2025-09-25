@@ -57,6 +57,7 @@ class BlogPostController extends Controller
             'posts' => $posts,
             'categories' => $categories,
             'filters' => $request->only(['status', 'category', 'search']),
+            'canCreate' => Auth::user() ? Gate::allows('create', BlogPost::class) : false,
         ]);
     }
 
@@ -123,6 +124,7 @@ class BlogPostController extends Controller
             'post' => $post,
             'relatedPosts' => $relatedPosts,
             'canEdit' => Auth::user() ? Gate::allows('update', $post) : false,
+            'canDelete' => Auth::user() ? Gate::allows('delete', $post) : false,
         ]);
     }
 
