@@ -25,5 +25,3 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
-.gitignore.local
-manage-hh.sh
