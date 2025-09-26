@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
-use App\Models\BlogCategory;
+use App\Services\BlogPostService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
+use App\Http\Requests\Blog\BlogPostIndexRequest;
 use App\Http\Requests\Blog\BlogPostStoreRequest;
 use App\Http\Requests\Blog\BlogPostUpdateRequest;
 use Illuminate\Support\Facades\Auth;
@@ -15,50 +15,20 @@ use Inertia\Inertia;
 class BlogPostController extends Controller
 {
     use AuthorizesRequests;
-    public function index(Request $request)
+
+    public function __construct(
+        protected BlogPostService $blogPostService
+    ) {}
+    public function index(BlogPostIndexRequest $request)
     {
-        $perPage = (int) $request->integer('per_page', 12);
-
-        $query = BlogPost::with(['user', 'category']);
-
-        // Filter by status for admin/author view
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        } else {
-            $query->published();
-        }
-
-        // Sort by published_at for published posts, created_at for drafts
-        if ($request->has('status') && $request->status === BlogPost::STATUS_DRAFT) {
-            $query->latest('created_at');
-        } else {
-            $query->latest('published_at');
-        }
-
-        // Filter by category
-        if ($request->has('category')) {
-            $query->whereHas('category', function ($q) use ($request) {
-                $q->where('slug', $request->category);
-            });
-        }
-
-        // Search functionality
-        if ($request->has('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('content', 'like', "%{$search}%")
-                    ->orWhere('excerpt', 'like', "%{$search}%");
-            });
-        }
-
-        $posts = $query->paginate($perPage);
-        $categories = BlogCategory::where('is_active', true)->get();
+        $posts = $this->blogPostService->getFilteredPosts($request);
+        $categories = $this->blogPostService->getActiveCategories();
 
         return Inertia::render('Blog/Posts/Index', [
             'posts' => $posts,
             'categories' => $categories,
-            'filters' => $request->only(['status', 'category', 'search']),
+            'filters' => $request->only(['status', 'category', 'search', 'sort_by', 'sort_order']),
+            'statuses' => BlogPost::STATUSES,
             'canCreate' => Auth::user() ? Gate::allows('create', BlogPost::class) : false,
         ]);
     }
@@ -67,7 +37,7 @@ class BlogPostController extends Controller
     {
         $this->authorize('create', BlogPost::class);
 
-        $categories = BlogCategory::where('is_active', true)->get();
+        $categories = $this->blogPostService->getActiveCategories();
 
         return Inertia::render('Blog/Posts/Create', [
             'categories' => $categories,
@@ -78,10 +48,8 @@ class BlogPostController extends Controller
     {
         $validated = $request->validated();
         $validated['user_id'] = Auth::id();
-        if ($validated['status'] === BlogPost::STATUS_PUBLISHED && empty($validated['published_at'])) {
-            $validated['published_at'] = now();
-        }
-        $post = BlogPost::create($validated);
+        
+        $post = $this->blogPostService->createPost($validated);
 
         return redirect()->route('blog.posts.show', $post)
             ->with('success', 'Post created successfully.');
@@ -94,17 +62,10 @@ class BlogPostController extends Controller
         $post->load(['user', 'category']);
 
         // Increment views for published posts
-        if ($post->isPublished()) {
-            $post->incrementViews();
-        }
+        $this->blogPostService->incrementViews($post);
 
         // Get related posts
-        $relatedPosts = BlogPost::published()
-            ->where('blog_category_id', $post->blog_category_id)
-            ->where('id', '!=', $post->id)
-            ->with(['user', 'category'])
-            ->take(3)
-            ->get();
+        $relatedPosts = $this->blogPostService->getRelatedPosts($post);
 
         return Inertia::render('Blog/Posts/Show', [
             'post' => $post,
@@ -118,7 +79,7 @@ class BlogPostController extends Controller
     {
         $this->authorize('update', $post);
 
-        $categories = BlogCategory::where('is_active', true)->get();
+        $categories = $this->blogPostService->getActiveCategories();
 
         return Inertia::render('Blog/Posts/Edit', [
             'post' => $post,
@@ -129,10 +90,8 @@ class BlogPostController extends Controller
     public function update(BlogPostUpdateRequest $request, BlogPost $post)
     {
         $validated = $request->validated();
-        if ($validated['status'] === BlogPost::STATUS_PUBLISHED && empty($validated['published_at'])) {
-            $validated['published_at'] = now();
-        }
-        $post->update($validated);
+        
+        $post = $this->blogPostService->updatePost($post, $validated);
 
         return redirect()->route('blog.posts.show', $post)
             ->with('success', 'Post updated successfully.');

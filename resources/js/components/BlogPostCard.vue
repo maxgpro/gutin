@@ -12,6 +12,7 @@ interface BlogPost {
     slug: string;
     excerpt: string | null;
     featured_image: string | null;
+    status: string;
     published_at: string | null;
     views_count: number;
     reading_time: number;
@@ -43,6 +44,23 @@ function formatDate(dateString: string | null): string {
         day: 'numeric',
     });
 }
+
+function getStatusVariant(status: string): "default" | "secondary" | "destructive" | "outline" {
+    switch (status) {
+        case 'published':
+            return 'default';
+        case 'draft':
+            return 'secondary';
+        case 'archived':
+            return 'outline';
+        default:
+            return 'secondary';
+    }
+}
+
+function getStatusLabel(status: string): string {
+    return status.charAt(0).toUpperCase() + status.slice(1);
+}
 </script>
 
 <style scoped>
@@ -65,18 +83,33 @@ function formatDate(dateString: string | null): string {
     <Card class="flex h-full flex-col overflow-hidden">
         <div v-if="post.featured_image" class="relative h-48 overflow-hidden">
             <img :src="post.featured_image" :alt="post.title" class="h-full w-full object-cover transition-transform hover:scale-105" />
-            <div
-                class="absolute top-3 left-3 rounded-full px-2 py-1 text-xs font-medium text-white"
-                :style="{ backgroundColor: post.category.color }"
-            >
-                {{ post.category.name }}
+            <div class="absolute top-3 left-3 flex gap-2">
+                <div
+                    class="rounded-full px-2 py-1 text-xs font-medium text-white"
+                    :style="{ backgroundColor: post.category.color }"
+                >
+                    {{ post.category.name }}
+                </div>
+                <Badge 
+                    v-if="post.status !== 'published'"
+                    :variant="getStatusVariant(post.status)"
+                    class="text-xs"
+                >
+                    {{ getStatusLabel(post.status) }}
+                </Badge>
             </div>
         </div>
 
         <CardContent class="flex-1 p-6">
-            <div v-if="!post.featured_image" class="mb-3">
+            <div v-if="!post.featured_image" class="mb-3 flex gap-2">
                 <Badge variant="secondary" :style="{ backgroundColor: post.category.color + '20', color: post.category.color }">
                     {{ post.category.name }}
+                </Badge>
+                <Badge 
+                    v-if="post.status !== 'published'"
+                    :variant="getStatusVariant(post.status)"
+                >
+                    {{ getStatusLabel(post.status) }}
                 </Badge>
             </div>
 

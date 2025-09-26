@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import BlogPostCard from '@/components/BlogPostCard.vue';
-import Icon from '@/components/Icon.vue';
 import LaravelPaginationAdapter from '@/components/LaravelPaginationAdapter.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +11,7 @@ import { type BreadcrumbItem } from '@/types';
 import type { BlogPostsIndexProps } from '@/types/blog';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
+import { ArrowDownAZ, ArrowDownUp, ArrowUpZA, Calendar, ListFilter, Search, Tag, FileText, X, Plus } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -31,9 +31,15 @@ const { canCreate } = props;
 const form = ref<{
     search: string;
     category: string | null;
+    status: string | null;
+    sort_by: string;
+    sort_order: string;
 }>({
     search: props.filters.search || '',
     category: props.filters.category || null,
+    status: props.filters.status || null,
+    sort_by: props.filters.sort_by || 'published_at',
+    sort_order: props.filters.sort_order || 'desc',
 });
 
 const debouncedSearch = useDebounceFn(() => {
@@ -47,12 +53,50 @@ watch(
     },
 );
 
+watch(
+    () => form.value.status,
+    () => {
+        updateFilters();
+    },
+);
+
+watch(
+    () => form.value.sort_by,
+    () => {
+        updateFilters();
+    },
+);
+
+watch(
+    () => form.value.sort_order,
+    () => {
+        updateFilters();
+    },
+);
+
 // Фильтры Категорий
 const categoryModel = computed({
     // GET: что отдаём Select-у
     get: () => form.value.category ?? '_all', // null → '_all' (Select покажет "All Categories")
     // SET: что записываем обратно в форму
     set: (v: string) => (form.value.category = v === '_all' ? null : v), // '_all' → null, иначе slug
+});
+
+// Фильтры Статусов
+const statusModel = computed({
+    get: () => form.value.status ?? '_all',
+    set: (v: string) => (form.value.status = v === '_all' ? null : v),
+});
+
+// Сортировка
+const sortByModel = computed({
+    get: () => form.value.sort_by,
+    set: (v: string) => (form.value.sort_by = v),
+});
+
+const sortOrderModel = computed({
+    get: () => form.value.sort_order,
+    set: (v: string) => (form.value.sort_order = v),
 });
 
 function updateFilters() {
@@ -63,14 +107,48 @@ function updateFilters() {
     }
 
     // Добавляем параметр category только если выбрана конкретная категория
-    // Если выбрано "All Categories" (_all) или null, параметр не добавляем
     if (form.value.category && form.value.category !== '_all') {
         params.set('category', form.value.category);
+    }
+
+    // Добавляем параметр status только если выбран конкретный статус
+    if (form.value.status && form.value.status !== '_all') {
+        params.set('status', form.value.status);
+    }
+
+    // Добавляем сортировку только если она отличается от дефолтной
+    if (form.value.sort_by && form.value.sort_by !== 'published_at') {
+        params.set('sort_by', form.value.sort_by);
+    }
+
+    if (form.value.sort_order && form.value.sort_order !== 'desc') {
+        params.set('sort_order', form.value.sort_order);
     }
 
     const queryString = params.toString();
     const url = blog.posts.index().url + (queryString ? `?${queryString}` : '');
     router.get(url, {}, { preserveState: true, replace: true });
+}
+
+// Проверка наличия активных фильтров
+const hasActiveFilters = computed(() => {
+    return (
+        form.value.search ||
+        (form.value.category && form.value.category !== '_all') ||
+        (form.value.status && form.value.status !== '_all') ||
+        form.value.sort_by !== 'published_at' ||
+        form.value.sort_order !== 'desc'
+    );
+});
+
+// Очистка всех фильтров
+function clearFilters() {
+    form.value.search = '';
+    form.value.category = null;
+    form.value.status = null;
+    form.value.sort_by = 'published_at';
+    form.value.sort_order = 'desc';
+    updateFilters();
 }
 </script>
 
@@ -80,36 +158,120 @@ function updateFilters() {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             <!-- Filters and Search -->
-            <div class="mb-6 flex flex-col gap-2 md:flex-row">
-                <div class="flex gap-2 order-2 md:order-1">
+            <div class="mb-6 space-y-4">
+                <!-- Second row: Filters and Sorting -->
+                <div class="flex gap-2 flex-col sm:flex-wrap sm:flex-row sm:flex-start">
+                    <!-- Top row: Create button and Search -->
+                    <div class="relative w-full">
+                        <Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input v-model="form.search" placeholder="Search posts..." class="min-w-md pl-10" @input="debouncedSearch" />
+                    </div>
                     <Button v-if="canCreate" as-child>
                         <Link :href="blog.posts.create().url">
-                            <Icon name="plus" class="h-4 w-4" />
+                            <Plus :size="20" class="h-4 w-4" />
                             Post
                         </Link>
                     </Button>
-                    
+
+                    <!-- Filters -->
                     <Select v-model="categoryModel">
-                        <SelectTrigger class="w-48">
-                            <SelectValue placeholder="All Categories" />
+                        <SelectTrigger class="w-full sm:w-48">
+                            <div class="flex items-center gap-2">
+                                <Tag class="h-4 w-4 text-muted-foreground" />
+                                <SelectValue placeholder="All Categories" />
+                            </div>
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="_all">All Categories</SelectItem>
+                            <SelectItem value="_all">
+                                <div class="flex items-center gap-2">All Categories</div>
+                            </SelectItem>
                             <SelectItem v-for="category in props.categories" :key="category.id" :value="category.slug">
-                                {{ category.name }}
+                                <div class="flex items-center gap-2">
+                                    {{ category.name }}
+                                </div>
                             </SelectItem>
                         </SelectContent>
                     </Select>
-                </div>
 
-                <div class="flex w-full order-1 md:order-2">
-                    <Input
-                        v-model="form.search"
-                        placeholder="Search posts..."
-                        class="min-w-md"
-                        @input="debouncedSearch"
-                    />
+                    <Select v-model="statusModel">
+                        <SelectTrigger class="w-full sm:w-40">
+                            <div class="flex items-center gap-2">
+                                <ListFilter class="h-4 w-4 text-muted-foreground" />
+                                <SelectValue placeholder="All Statuses" />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="_all">
+                                <div class="flex items-center gap-2">All Statuses</div>
+                            </SelectItem>
+                            <SelectItem v-for="status in props.statuses" :key="status" :value="status">
+                                <div class="flex items-center gap-2">
+                                    {{ status.charAt(0).toUpperCase() + status.slice(1) }}
+                                </div>
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <!-- Sorting -->
+                    <Select v-model="sortByModel">
+                        <SelectTrigger class="w-full sm:w-40">
+                            <div class="flex items-center gap-2">
+                                <Calendar class="h-4 w-4 text-muted-foreground" />
+                                <SelectValue />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="published_at">
+                                <div class="flex items-center gap-2">Published Date</div>
+                            </SelectItem>
+                            <SelectItem value="created_at">
+                                <div class="flex items-center gap-2">Created Date</div>
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <Select v-model="sortOrderModel">
+                        <SelectTrigger class="w-full sm:w-32">
+                            <div class="flex items-center gap-2">
+                                <ArrowDownUp />
+                                <SelectValue />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="desc">
+                                <div class="flex items-center gap-2">
+                                    <ArrowDownAZ class="h-4 w-4" />
+                                    Newest
+                                </div>
+                            </SelectItem>
+                            <SelectItem value="asc">
+                                <div class="flex items-center gap-2">
+                                    <ArrowUpZA class="h-4 w-4" />
+                                    Oldest
+                                </div>
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <!-- Clear Filters Button -->
+                    <Button
+                        variant="outline"
+                        @click="clearFilters"
+                        :disabled="!hasActiveFilters"
+                        :class="{
+                            'w-full sm:w-auto': true,
+                        }"
+                    >
+                        <X :size="20" class="h-4 w-4" />
+                        Clear Filters
+                    </Button>
                 </div>
+            </div>
+
+            <!-- Results Count -->
+            <div v-if="posts.data.length > 0" class="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+                <ListFilter class="h-4 w-4" />
+                Showing {{ posts.from }} to {{ posts.to }} of {{ posts.total }} results
             </div>
 
             <!-- Posts Grid -->
@@ -118,7 +280,7 @@ function updateFilters() {
             </div>
 
             <div v-else class="py-12 text-center">
-                <Icon name="file-text" class="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                <FileText :size="20" class="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
                 <p class="text-lg text-muted-foreground">No blog posts found.</p>
                 <Button v-if="canCreate" as-child class="mt-4">
                     <Link :href="blog.posts.create().url">Create Your First Post</Link>

@@ -80,11 +80,24 @@ class BlogSeeder extends Seeder
                 'user_id' => $allUsers->random()->id,
             ]);
 
+        // Create some archived posts
+        BlogPost::factory()
+            ->count(5)
+            ->state([
+                'status' => BlogPost::STATUS_ARCHIVED,
+                'published_at' => fake()->dateTimeBetween('-6 months', '-1 month'),
+            ])
+            ->create([
+                'blog_category_id' => $categories->random()->id,
+                'user_id' => $allUsers->random()->id,
+            ]);
+
         $this->command->info('Blog seeder completed successfully!');
         $this->command->info('Created:');
         $this->command->info('- ' . BlogCategory::count() . ' blog categories');
         $this->command->info('- ' . BlogPost::count() . ' blog posts');
-        $this->command->info('- ' . BlogPost::where('status', 'published')->count() . ' published posts');
-        $this->command->info('- ' . BlogPost::where('status', 'draft')->count() . ' draft posts');
+        $this->command->info('- ' . BlogPost::where('status', BlogPost::STATUS_PUBLISHED)->count() . ' published posts');
+        $this->command->info('- ' . BlogPost::where('status', BlogPost::STATUS_DRAFT)->count() . ' draft posts');
+        $this->command->info('- ' . BlogPost::where('status', BlogPost::STATUS_ARCHIVED)->count() . ' archived posts');
     }
 }

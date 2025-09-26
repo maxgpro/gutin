@@ -63,6 +63,8 @@ export interface BlogFilters {
     search?: string;
     category?: string;
     status?: string;
+    sort_by?: string;
+    sort_order?: string;
 }
 
 // Пропсы для страниц блога
@@ -70,6 +72,7 @@ export interface BlogPostsIndexProps {
     posts: LaravelPagination<BlogPost>;
     categories: BlogCategory[];
     filters: BlogFilters;
+    statuses: string[];
     canCreate: boolean;
 }
 
