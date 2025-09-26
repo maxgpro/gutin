@@ -125,6 +125,13 @@ function updateFilters() {
         params.set('sort_order', form.value.sort_order);
     }
 
+    // Сохраняем текущее значение per_page из URL
+    const currentUrl = new URL(window.location.href);
+    const currentPerPage = currentUrl.searchParams.get('per_page');
+    if (currentPerPage) {
+        params.set('per_page', currentPerPage);
+    }
+
     const queryString = params.toString();
     const url = blog.posts.index().url + (queryString ? `?${queryString}` : '');
     router.get(url, {}, { preserveState: true, replace: true });
@@ -160,7 +167,7 @@ function clearFilters() {
             <!-- Filters and Search -->
             <div class="mb-6 space-y-4">
                 <!-- Second row: Filters and Sorting -->
-                <div class="flex gap-2 flex-col sm:flex-wrap sm:flex-row sm:flex-start">
+                <div class="flex gap-2 flex-col sm:flex-row sm:flex-wrap sm:flex-start">
                     <!-- Top row: Create button and Search -->
                     <div class="relative w-full">
                         <Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -268,12 +275,6 @@ function clearFilters() {
                 </div>
             </div>
 
-            <!-- Results Count -->
-            <div v-if="posts.data.length > 0" class="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-                <ListFilter class="h-4 w-4" />
-                Showing {{ posts.from }} to {{ posts.to }} of {{ posts.total }} results
-            </div>
-
             <!-- Posts Grid -->
             <div v-if="posts.data.length > 0" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <BlogPostCard v-for="post in posts.data" :key="post.id" :post="post" />
@@ -287,9 +288,17 @@ function clearFilters() {
                 </Button>
             </div>
 
-            <!-- Pagination -->
-            <div v-if="props.posts.total > 1" class="mt-8">
-                <LaravelPaginationAdapter :total="props.posts.total" :perPage="props.posts.per_page" :currentPage="props.posts.current_page" />
+            <!-- Pagination with Results Count -->
+            <div v-if="props.posts.total > 6" class="mt-8">
+                <LaravelPaginationAdapter 
+                    :total="props.posts.total" 
+                    :perPage="props.posts.per_page" 
+                    :currentPage="props.posts.current_page"
+                    :from="props.posts.from"
+                    :to="props.posts.to"
+                    :showPerPageSelector="true"
+                    :showResultsCount="true"
+                />
             </div>
         </div>
     </AppLayout>
