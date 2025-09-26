@@ -6,6 +6,8 @@ use App\Models\BlogPost;
 use App\Models\BlogCategory;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use App\Http\Requests\Blog\BlogPostStoreRequest;
+use App\Http\Requests\Blog\BlogPostUpdateRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -72,28 +74,13 @@ class BlogPostController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(BlogPostStoreRequest $request)
     {
-        $this->authorize('create', BlogPost::class);
-
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:blog_posts',
-            'blog_category_id' => 'required|exists:blog_categories,id',
-            'excerpt' => 'nullable|string',
-            'content' => 'required|string',
-            'featured_image' => 'nullable|string',
-            'meta_data' => 'nullable|array',
-            'status' => 'required|in:draft,published,archived',
-            'published_at' => 'nullable|date',
-        ]);
-
+        $validated = $request->validated();
         $validated['user_id'] = Auth::id();
-
         if ($validated['status'] === 'published' && empty($validated['published_at'])) {
             $validated['published_at'] = now();
         }
-
         $post = BlogPost::create($validated);
 
         return redirect()->route('blog.posts.show', $post)
@@ -102,7 +89,6 @@ class BlogPostController extends Controller
 
     public function show(BlogPost $post)
     {
-        // Проверяем права на просмотр поста
         $this->authorize('view', $post);
 
         $post->load(['user', 'category']);
@@ -140,26 +126,12 @@ class BlogPostController extends Controller
         ]);
     }
 
-    public function update(Request $request, BlogPost $post)
+    public function update(BlogPostUpdateRequest $request, BlogPost $post)
     {
-        $this->authorize('update', $post);
-
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:blog_posts,slug,' . $post->id,
-            'blog_category_id' => 'required|exists:blog_categories,id',
-            'excerpt' => 'nullable|string',
-            'content' => 'required|string',
-            'featured_image' => 'nullable|string',
-            'meta_data' => 'nullable|array',
-            'status' => 'required|in:draft,published,archived',
-            'published_at' => 'nullable|date',
-        ]);
-
+        $validated = $request->validated();
         if ($validated['status'] === 'published' && empty($validated['published_at'])) {
             $validated['published_at'] = now();
         }
-
         $post->update($validated);
 
         return redirect()->route('blog.posts.show', $post)
