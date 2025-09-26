@@ -23,13 +23,16 @@ class BlogPostController extends Controller
     {
         $posts = $this->blogPostService->getFilteredPosts($request);
         $categories = $this->blogPostService->getActiveCategories();
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
 
         return Inertia::render('Blog/Posts/Index', [
             'posts' => $posts,
             'categories' => $categories,
             'filters' => $request->only(['status', 'category', 'search', 'sort_by', 'sort_order']),
             'statuses' => BlogPost::STATUSES,
-            'canCreate' => Auth::user() ? Gate::allows('create', BlogPost::class) : false,
+            'canCreate' => $user ? Gate::allows('create', BlogPost::class) : false,
+            'canFilterByStatus' => $user?->isAdmin() ?? false,
         ]);
     }
 

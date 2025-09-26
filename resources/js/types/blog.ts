@@ -74,6 +74,7 @@ export interface BlogPostsIndexProps {
     filters: BlogFilters;
     statuses: string[];
     canCreate: boolean;
+    canFilterByStatus: boolean;
 }
 
 export interface BlogPostsCreateProps {

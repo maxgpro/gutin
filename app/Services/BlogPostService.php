@@ -8,6 +8,7 @@ use App\Http\Requests\Blog\BlogPostIndexRequest;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class BlogPostService
 {
@@ -41,12 +42,19 @@ class BlogPostService
      */
     protected function applyStatusFilter(Builder $query, BlogPostIndexRequest $request): void
     {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        $isAdmin = $user && $user->isAdmin();
+        
         if ($request->has('status') && in_array($request->status, BlogPost::STATUSES)) {
+            // Если статус передан и валиден, применяем фильтр
+            // (валидация прав происходит в Request)
             $query->where('status', $request->status);
-        } elseif (!$request->has('status')) {
-            // Default: show only published posts for guests
+        } elseif (!$isAdmin) {
+            // Не-админы видят только опубликованные посты
             $query->published();
         }
+        // Админы без фильтра статуса видят ВСЕ посты (ничего не добавляем к query)
     }
 
     /**

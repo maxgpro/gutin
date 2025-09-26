@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\BlogPostService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 class BlogPostServiceTest extends TestCase
@@ -38,11 +39,16 @@ class BlogPostServiceTest extends TestCase
 
     public function test_get_filtered_posts_applies_status_filter()
     {
-        $user = User::factory()->create();
+        // Create admin user and authenticate
+        $adminRole = \App\Models\Role::create(['name' => 'admin']);
+        $adminUser = User::factory()->create();
+        $adminUser->roles()->attach($adminRole);
+        $this->actingAs($adminUser);
+        
         $category = BlogCategory::factory()->active()->create();
         
-        BlogPost::factory()->published()->create(['user_id' => $user->id, 'blog_category_id' => $category->id]);
-        BlogPost::factory()->draft()->create(['user_id' => $user->id, 'blog_category_id' => $category->id]);
+        BlogPost::factory()->published()->create(['user_id' => $adminUser->id, 'blog_category_id' => $category->id]);
+        BlogPost::factory()->draft()->create(['user_id' => $adminUser->id, 'blog_category_id' => $category->id]);
 
         // Create request with status filter
         $request = new BlogPostIndexRequest();
@@ -54,29 +60,57 @@ class BlogPostServiceTest extends TestCase
         $this->assertEquals(BlogPost::STATUS_DRAFT, $result->items()[0]->status);
     }
 
+    public function test_non_admin_users_see_only_published_posts()
+    {
+        // Create regular user and authenticate
+        $regularUser = User::factory()->create();
+        $this->actingAs($regularUser);
+        
+        $category = BlogCategory::factory()->active()->create();
+        
+        BlogPost::factory()->published()->create(['user_id' => $regularUser->id, 'blog_category_id' => $category->id]);
+        BlogPost::factory()->draft()->create(['user_id' => $regularUser->id, 'blog_category_id' => $category->id]);
+        BlogPost::factory()->create([
+            'user_id' => $regularUser->id, 
+            'blog_category_id' => $category->id,
+            'status' => BlogPost::STATUS_ARCHIVED
+        ]);
+
+        // Regular user should only see published posts
+        $request = new BlogPostIndexRequest();
+        $result = $this->service->getFilteredPosts($request);
+
+        $this->assertCount(1, $result->items());
+        $this->assertEquals(BlogPost::STATUS_PUBLISHED, $result->items()[0]->status);
+    }
+
     public function test_get_filtered_posts_applies_search()
     {
+        // Clear any existing posts and logout any user
+        BlogPost::query()->delete();
+        Auth::logout();
+        
         $user = User::factory()->create();
         $category = BlogCategory::factory()->active()->create();
         
         BlogPost::factory()->published()->create([
-            'title' => 'Laravel Tutorial',
+            'title' => 'Unique Laravel Search Test Tutorial',
             'user_id' => $user->id,
             'blog_category_id' => $category->id
         ]);
         BlogPost::factory()->published()->create([
-            'title' => 'Vue.js Guide',
+            'title' => 'Vue.js Guide Without Target Word',
             'user_id' => $user->id,
             'blog_category_id' => $category->id
         ]);
 
         $request = new BlogPostIndexRequest();
-        $request->merge(['search' => 'Laravel']);
+        $request->merge(['search' => 'Unique Laravel Search Test']);
 
         $result = $this->service->getFilteredPosts($request);
 
         $this->assertCount(1, $result->items());
-        $this->assertStringContainsString('Laravel', $result->items()[0]->title);
+        $this->assertStringContainsString('Unique Laravel Search Test', $result->items()[0]->title);
     }
 
     public function test_get_related_posts_returns_posts_from_same_category()

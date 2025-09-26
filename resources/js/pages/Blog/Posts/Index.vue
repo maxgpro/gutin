@@ -26,7 +26,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const props = defineProps<BlogPostsIndexProps>();
-const { canCreate } = props;
+const { canCreate, canFilterByStatus } = props;
 
 const form = ref<{
     search: string;
@@ -135,7 +135,7 @@ const hasActiveFilters = computed(() => {
     return (
         form.value.search ||
         (form.value.category && form.value.category !== '_all') ||
-        (form.value.status && form.value.status !== '_all') ||
+        (canFilterByStatus && form.value.status && form.value.status !== '_all') ||
         form.value.sort_by !== 'published_at' ||
         form.value.sort_order !== 'desc'
     );
@@ -145,7 +145,7 @@ const hasActiveFilters = computed(() => {
 function clearFilters() {
     form.value.search = '';
     form.value.category = null;
-    form.value.status = null;
+    form.value.status = null; // Можно безопасно очищать всегда
     form.value.sort_by = 'published_at';
     form.value.sort_order = 'desc';
     updateFilters();
@@ -193,7 +193,7 @@ function clearFilters() {
                         </SelectContent>
                     </Select>
 
-                    <Select v-model="statusModel">
+                    <Select v-if="canFilterByStatus" v-model="statusModel">
                         <SelectTrigger class="w-full sm:w-40">
                             <div class="flex items-center gap-2">
                                 <ListFilter class="h-4 w-4 text-muted-foreground" />

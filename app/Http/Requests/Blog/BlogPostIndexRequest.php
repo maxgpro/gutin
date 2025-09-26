@@ -4,12 +4,25 @@ namespace App\Http\Requests\Blog;
 
 use App\Models\BlogPost;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class BlogPostIndexRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // Все могут просматривать список постов
+        // Все могут просматривать список постов
+        // Но фильтрация по статусам - только для админов
+        if ($this->has('status')) {
+            /** @var \App\Models\User|null $user */
+            $user = Auth::user();
+            
+            // Если статус не 'published', требуется админ
+            if ($this->status !== BlogPost::STATUS_PUBLISHED && (!$user || !$user->isAdmin())) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     public function rules(): array

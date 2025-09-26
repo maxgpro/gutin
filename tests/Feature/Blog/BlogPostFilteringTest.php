@@ -115,13 +115,18 @@ test('posts can be sorted by created_at', function () {
 });
 
 test('invalid status filter returns validation error', function () {
+    // Create admin to test validation (not authorization)
+    $adminRole = \App\Models\Role::firstOrCreate(['name' => 'admin']);
+    $admin = \App\Models\User::factory()->create();
+    $admin->roles()->attach($adminRole);
+    
     BlogPost::factory()->create([
         'status' => BlogPost::STATUS_PUBLISHED,
         'published_at' => now(),
         'blog_category_id' => $this->category->id,
     ]);
 
-    $response = $this->get(route('blog.posts.index', ['status' => 'invalid_status']));
+    $response = $this->actingAs($admin)->get(route('blog.posts.index', ['status' => 'invalid_status']));
     $response->assertRedirect();
     $response->assertSessionHasErrors(['status']);
 });
