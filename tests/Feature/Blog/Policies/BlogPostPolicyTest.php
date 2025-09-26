@@ -14,7 +14,7 @@ beforeEach(function () {
     $this->post = BlogPost::factory()->create([
         'user_id' => $this->user->id,
         'blog_category_id' => $this->category->id,
-        'status' => 'published',
+        'status' => BlogPost::STATUS_PUBLISHED,
         'published_at' => now()
     ]);
 });
@@ -69,7 +69,7 @@ test('guest cannot view draft post', function () {
     $draft = BlogPost::factory()->create([
         'user_id' => $this->user->id,
         'blog_category_id' => $this->category->id,
-        'status' => 'draft'
+        'status' => BlogPost::STATUS_DRAFT,
     ]);
 
     // Тест политики для неавторизованного пользователя (null)

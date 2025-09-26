@@ -46,7 +46,7 @@ class BlogCategory extends Model
 
     public function publishedPosts(): HasMany
     {
-        return $this->posts()->where('status', 'published')->whereNotNull('published_at');
+        return $this->posts()->where('status', BlogPost::STATUS_PUBLISHED)->whereNotNull('published_at');
     }
 
     public function getRouteKeyName(): string

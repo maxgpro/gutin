@@ -21,7 +21,7 @@ test('admin can create post with syntax highlighted code blocks', function () {
             'content' => '<p>Here is some JavaScript code:</p>' . $codeContent,
             'blog_category_id' => $this->category->id,
             'excerpt' => 'A tutorial about JavaScript',
-            'status' => 'published',
+            'status' => BlogPost::STATUS_PUBLISHED,
         ]);
 
     $response->assertRedirect();
@@ -52,7 +52,7 @@ class Example {
             'content' => $content,
             'blog_category_id' => $this->category->id,
             'excerpt' => 'Examples in multiple programming languages',
-            'status' => 'published',
+            'status' => BlogPost::STATUS_PUBLISHED,
         ]);
 
     $response->assertRedirect();
@@ -79,7 +79,7 @@ const user: User = {
     name: "John",
     email: "john@example.com"
 };</code></pre>',
-        'status' => 'published',
+        'status' => BlogPost::STATUS_PUBLISHED,
         'published_at' => now(),
     ]);
 

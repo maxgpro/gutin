@@ -29,7 +29,7 @@ class BlogPostController extends Controller
         }
 
         // Sort by published_at for published posts, created_at for drafts
-        if ($request->has('status') && $request->status === 'draft') {
+        if ($request->has('status') && $request->status === BlogPost::STATUS_DRAFT) {
             $query->latest('created_at');
         } else {
             $query->latest('published_at');
@@ -78,7 +78,7 @@ class BlogPostController extends Controller
     {
         $validated = $request->validated();
         $validated['user_id'] = Auth::id();
-        if ($validated['status'] === 'published' && empty($validated['published_at'])) {
+        if ($validated['status'] === BlogPost::STATUS_PUBLISHED && empty($validated['published_at'])) {
             $validated['published_at'] = now();
         }
         $post = BlogPost::create($validated);
@@ -129,7 +129,7 @@ class BlogPostController extends Controller
     public function update(BlogPostUpdateRequest $request, BlogPost $post)
     {
         $validated = $request->validated();
-        if ($validated['status'] === 'published' && empty($validated['published_at'])) {
+        if ($validated['status'] === BlogPost::STATUS_PUBLISHED && empty($validated['published_at'])) {
             $validated['published_at'] = now();
         }
         $post->update($validated);

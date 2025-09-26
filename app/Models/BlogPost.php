@@ -6,11 +6,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 class BlogPost extends Model
 {
     use HasFactory;
+
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_PUBLISHED = 'published';
+    public const STATUS_ARCHIVED = 'archived';
+    public const STATUSES = [
+        self::STATUS_DRAFT,
+        self::STATUS_PUBLISHED,
+        self::STATUS_ARCHIVED,
+    ];
+
     protected $fillable = [
         'user_id',
         'blog_category_id',
@@ -60,19 +69,19 @@ class BlogPost extends Model
 
     public function scopePublished($query)
     {
-        return $query->where('status', 'published')
+        return $query->where('status', self::STATUS_PUBLISHED)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now());
     }
 
     public function scopeDraft($query)
     {
-        return $query->where('status', 'draft');
+        return $query->where('status', self::STATUS_DRAFT);
     }
 
     public function isPublished(): bool
     {
-        return $this->status === 'published'
+        return $this->status === self::STATUS_PUBLISHED
             && $this->published_at !== null
             && $this->published_at->isPast();
     }
@@ -80,7 +89,7 @@ class BlogPost extends Model
     public function publish(): void
     {
         $this->update([
-            'status' => 'published',
+            'status' => self::STATUS_PUBLISHED,
             'published_at' => $this->published_at ?? now(),
         ]);
     }
