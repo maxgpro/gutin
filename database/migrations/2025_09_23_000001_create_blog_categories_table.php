@@ -40,7 +40,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('blog_categories');
         Schema::dropIfExists('blog_posts');
+        Schema::dropIfExists('blog_categories');
     }
 };
