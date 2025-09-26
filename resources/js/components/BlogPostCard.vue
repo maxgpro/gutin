@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Icon from '@/components/Icon.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import blog from '@/routes/blog';
+import { Clock, Eye } from 'lucide-vue-next';
 
 
 interface BlogPost {
@@ -132,11 +132,11 @@ function getStatusLabel(status: string): string {
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="flex items-center gap-1">
-                        <Icon name="clock" class="h-3 w-3" />
+                        <Clock class="h-3 w-3" />
                         {{ post.reading_time }}min
                     </span>
                     <span class="flex items-center gap-1">
-                        <Icon name="eye" class="h-3 w-3" />
+                        <Eye class="h-3 w-3" />
                         {{ post.views_count }}
                     </span>
                 </div>

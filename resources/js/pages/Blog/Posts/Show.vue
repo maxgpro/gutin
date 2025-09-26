@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import BlogPostCard from '@/components/BlogPostCard.vue';
-import Icon from '@/components/Icon.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -9,7 +8,7 @@ import blog from '@/routes/blog';
 import { type BreadcrumbItem } from '@/types';
 import { type BlogPostsShowProps } from '@/types/blog';
 import { Head, Link, router } from '@inertiajs/vue3';
-import { SquarePen, Trash2 } from 'lucide-vue-next';
+import { Clock, Eye, SquarePen, Trash2 } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 const props = defineProps<BlogPostsShowProps>();
@@ -75,13 +74,13 @@ function deletePost() {
                         <span>By {{ post.user.name }}</span>
                         <span>{{ formatDate(post.published_at) }}</span>
                         <span class="flex items-center gap-1">
-                            <Icon name="clock" class="h-4 w-4" />
+                            <Clock class="h-4 w-4" />
                             {{ post.reading_time }} min read
                         </span>
                     </div>
                     <div class="flex items-center gap-4">
                         <span class="flex items-center gap-1">
-                            <Icon name="eye" class="h-4 w-4" />
+                            <Eye class="h-4 w-4" />
                             {{ post.views_count }} views
                         </span>
 
