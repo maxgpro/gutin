@@ -2,25 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LocaleSwitchRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
 class LocaleController extends Controller
 {
     /**
      * Switch application locale
+     * Handles both AJAX and regular form requests
      */
-    public function switch(Request $request, string $locale): RedirectResponse
+    public function switch(LocaleSwitchRequest $request): JsonResponse | RedirectResponse
     {
-        $availableLocales = array_keys(config('app.available_locales'));
+        $locale = $request->validated('locale');
         
-        if (!in_array($locale, $availableLocales)) {
-            abort(400, 'Unsupported locale');
-        }
-
         Session::put('locale', $locale);
         
-        return redirect()->back();
+        
+        // todo: delete loging
+        \Log::info("Locale switched to: {$locale}");
+        
+        // Return JSON for AJAX requests, redirect for regular forms
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'locale' => $locale,
+                'message' => "Language switched to {$locale}"
+            ]);
+        }
+        
+        return redirect()->back()->with('success', "Language switched to {$locale}");
     }
 }

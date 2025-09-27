@@ -8,12 +8,17 @@ Route::get('/', function () {
     return redirect()->route('blog.posts.index');
 })->name('home');
 
+Route::get('/i18n-demo', function () {
+    return Inertia::render('I18nDemo');
+})->name('i18n.demo');
+
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Locale switching
-Route::post('locale/{locale}', [\App\Http\Controllers\LocaleController::class, 'switch'])
+// Locale switching - unified endpoint for both AJAX and form requests
+Route::post('locale/switch', [\App\Http\Controllers\LocaleController::class, 'switch'])
+    ->middleware([\App\Http\Middleware\LocaleThrottleMiddleware::class])
     ->name('locale.switch');
 
 require __DIR__.'/settings.php';

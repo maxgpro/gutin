@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LanguageIcons from '@/components/LanguageIcons.vue';
 import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { toUrl } from '@/lib/utils';
 import { type NavItem } from '@/types';
@@ -22,6 +23,12 @@ defineProps<Props>();
                             <span>{{ item.title }}</span>
                         </a>
                     </SidebarMenuButton>
+                </SidebarMenuItem>
+                <!-- Language Icons -->
+                <SidebarMenuItem>
+                    <div class="flex w-full justify-center p-2">
+                        <LanguageIcons />
+                    </div>
                 </SidebarMenuItem>
             </SidebarMenu>
         </SidebarGroupContent>

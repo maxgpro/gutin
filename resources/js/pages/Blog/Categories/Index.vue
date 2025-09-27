@@ -1,22 +1,27 @@
 <script setup lang="ts">
 import Icon from '@/components/Icon.vue';
-import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { useLocalizedField } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import blog from '@/routes/blog';
 import { type BreadcrumbItem } from '@/types';
 import type { BlogCategoriesIndexProps, BlogCategory } from '@/types/blog';
 import { Head, Link, router } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
+
+// Composables
+const { t } = useI18n();
+const { getLocalized } = useLocalizedField();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Dashboard',
+        title: t('navigation.dashboard'),
         href: dashboard().url,
     },
     {
-        title: 'Blog Categories',
+        title: t('blog.categories.title'),
         href: blog.categories.index().url,
     },
 ];
@@ -26,26 +31,28 @@ const { canCreate } = props;
 
 function deleteCategory(category: BlogCategory) {
     if ((category.posts_count || 0) > 0) {
-        alert('Cannot delete category with existing posts.');
+        alert(t('blog.categories.cannot_delete_with_posts'));
         return;
     }
 
-    if (confirm(`Are you sure you want to delete the category "${category.name}"?`)) {
+    const categoryName = getLocalized(category.name);
+    if (confirm(t('messages.confirm_delete') + ` "${categoryName}"?`)) {
         router.delete(blog.categories.destroy(category).url);
     }
 }
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head :title="t('blog.categories.title')" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             <div class="mb-8 flex items-center justify-between">
+                <h1 class="text-3xl font-bold tracking-tight">{{ t('blog.categories.title') }}</h1>
                 <Button v-if="canCreate" as-child>
                     <Link :href="blog.categories.create().url">
                         <Icon name="plus" class="h-4 w-4" />
-                        Category
+                        {{ t('blog.categories.create') }}
                     </Link>
                 </Button>
             </div>
@@ -56,30 +63,30 @@ function deleteCategory(category: BlogCategory) {
                         <div class="mb-3 flex items-start justify-between">
                             <div class="mt-1 h-4 w-4 shrink-0 rounded-full" :style="{ backgroundColor: category.color }"></div>
                             <div class="text-sm text-muted-foreground">
-                                {{ category.posts_count }} {{ category.posts_count === 1 ? 'post' : 'posts' }}
+                                {{ t('blog.categories.posts_count', { count: category.posts_count || 0 }, category.posts_count || 0) }}
                             </div>
                         </div>
 
                         <h3 class="mb-2 text-xl font-semibold">
                             <!-- <TextLink :href="blog.categories.show(category)" class="hover:text-primary"> -->
-                                {{ category.name }}
+                            {{ getLocalized(category.name) }}
                             <!-- </TextLink> -->
                         </h3>
 
-                        <p v-if="category.description" class="mb-4 text-muted-foreground">
-                            {{ category.description }}
+                        <p v-if="getLocalized(category.description)" class="mb-4 text-muted-foreground">
+                            {{ getLocalized(category.description) }}
                         </p>
 
                         <div v-if="$page.props.auth?.user" class="flex gap-2">
                             <Button variant="outline" size="sm" as-child>
                                 <Link :href="blog.categories.edit(category).url">
                                     <Icon name="edit" class="mr-1 h-3 w-3" />
-                                    Edit
+                                    {{ t('common.edit') }}
                                 </Link>
                             </Button>
                             <Button @click="deleteCategory(category)" variant="outline" size="sm" :disabled="(category.posts_count || 0) > 0">
                                 <Icon name="trash-2" class="mr-1 h-3 w-3" />
-                                Delete
+                                {{ t('common.delete') }}
                             </Button>
                         </div>
                     </CardContent>
@@ -88,9 +95,9 @@ function deleteCategory(category: BlogCategory) {
 
             <div v-else class="py-12 text-center">
                 <Icon name="folder" class="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-                <p class="text-lg text-muted-foreground">No categories found.</p>
+                <p class="text-lg text-muted-foreground">{{ t('blog.categories.no_categories') }}</p>
                 <Button v-if="$page.props.auth?.user" as-child class="mt-4">
-                    <Link :href="blog.categories.create().url">Create Your First Category</Link>
+                    <Link :href="blog.categories.create().url">{{ t('blog.categories.create') }}</Link>
                 </Button>
             </div>
         </div>

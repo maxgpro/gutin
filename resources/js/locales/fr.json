@@ -1,0 +1,96 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer", 
+    "edit": "Modifier",
+    "create": "Créer",
+    "back": "Retour",
+    "loading": "Chargement...",
+    "search": "Rechercher",
+    "clear": "Effacer",
+    "submit": "Soumettre",
+    "confirm": "Confirmer",
+    "close": "Fermer",
+    "yes": "Oui",
+    "no": "Non",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "days_ago": "{count, plural, one {il y a # jour} other {il y a # jours}}"
+  },
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "blog": "Blog",
+    "categories": "Catégories",
+    "posts": "Articles",
+    "settings": "Paramètres",
+    "profile": "Profil",
+    "logout": "Se déconnecter"
+  },
+  "blog": {
+    "categories": {
+      "title": "Catégories du blog",
+      "create": "Créer une catégorie",
+      "edit": "Modifier la catégorie",
+      "name": "Nom",
+      "description": "Description",
+      "color": "Couleur",
+      "active": "Active",
+      "posts_count_label": "Nombre d'articles",
+      "posts_count": "{count} article | {count} articles",
+      "no_categories": "Aucune catégorie pour l'instant",
+      "created_successfully": "Catégorie créée avec succès",
+      "updated_successfully": "Catégorie mise à jour avec succès",
+      "deleted_successfully": "Catégorie supprimée",
+      "cannot_delete_with_posts": "Impossible de supprimer une catégorie avec des articles existants"
+    },
+    "posts": {
+      "title": "Articles du blog",
+      "create": "Créer un article",
+      "edit": "Modifier l'article",
+      "title_field": "Titre",
+      "content": "Contenu",
+      "excerpt": "Extrait",
+      "category": "Catégorie",
+      "status": "Statut",
+      "published_at": "Date de publication",
+      "views": "Vues",
+      "reading_time": "min de lecture",
+      "no_posts": "Aucun article pour l'instant",
+      "created_successfully": "Article créé avec succès",
+      "updated_successfully": "Article mis à jour avec succès",
+      "deleted_successfully": "Article supprimé",
+      "status_draft": "Brouillon",
+      "status_published": "Publié",
+      "status_archived": "Archivé"
+    },
+    "filters": {
+      "all": "Tous",
+      "status": "Par statut",
+      "category": "Par catégorie",
+      "sort_by": "Trier par",
+      "sort_created_desc": "Plus récents d'abord",
+      "sort_created_asc": "Plus anciens d'abord",
+      "sort_published_desc": "Récemment publiés",
+      "sort_published_asc": "Anciennement publiés"
+    }
+  },
+  "forms": {
+    "validation": {
+      "required": "Ce champ est requis",
+      "email": "Veuillez entrer une adresse e-mail valide",
+      "min": "Longueur minimale : {min} caractères",
+      "max": "Longueur maximale : {max} caractères"
+    }
+  },
+  "messages": {
+    "success": "Opération terminée avec succès",
+    "error": "Une erreur s'est produite",
+    "confirm_delete": "Êtes-vous sûr de vouloir supprimer ?",
+    "no_data": "Aucune donnée à afficher"
+  },
+  "language": {
+    "switch": "Changer de langue",
+    "current": "Langue actuelle : Français"
+  }
+}

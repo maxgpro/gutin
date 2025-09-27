@@ -26,7 +26,6 @@ const mainNavItems = computed(() => {
             icon: Tag,
         });
     }
-
     // Блог посты доступны всем
     items.push(
         {
@@ -34,7 +33,6 @@ const mainNavItems = computed(() => {
             href: blog.posts.index(),
             icon: FileText,
         });
-
     // Добавляем пункт HH только для пользователей с доступом
     if (page.props.auth?.canAccessHh) {
         items.push(
@@ -62,6 +60,11 @@ const footerNavItems: NavItem[] = [
     {
         title: 'Documentation',
         href: 'https://laravel.com/docs/starter-kits#vue',
+        icon: BookOpen,
+    },
+    {
+        title: 'i18n Demo',
+        href: '/i18n-demo',
         icon: BookOpen,
     },
 ];

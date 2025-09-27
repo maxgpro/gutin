@@ -1,4 +1,4 @@
-# AI Agent Instructions for Laravel + Vue + Inertia.js Project
+# AI Agent Instructions for Laravel 12 + Vue + Inertia.js Project
 
 ## Architecture Overview
 
