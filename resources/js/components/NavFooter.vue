@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import LanguageIcons from '@/components/LanguageIcons.vue';
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { toUrl } from '@/lib/utils';
 import { type NavItem } from '@/types';
@@ -13,7 +13,7 @@ defineProps<Props>();
 </script>
 
 <template>
-    <SidebarGroup :class="`group-data-[collapsible=icon]:p-0 ${$props.class || ''}`">
+    <SidebarGroup :class="`group-data-[collapsible=icon]:p-0 transition-all duration-100 ${$props.class || ''}`">
         <SidebarGroupContent>
             <SidebarMenu>
                 <SidebarMenuItem v-for="item in items" :key="item.title">
@@ -24,10 +24,10 @@ defineProps<Props>();
                         </a>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
-                <!-- Language Icons -->
+                <!-- Language Switcher -->
                 <SidebarMenuItem>
-                    <div class="flex w-full justify-center p-2">
-                        <LanguageIcons />
+                    <div class="flex w-full justify-start">
+                        <LanguageSwitcher />
                     </div>
                 </SidebarMenuItem>
             </SidebarMenu>

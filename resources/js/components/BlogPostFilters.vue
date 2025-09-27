@@ -33,7 +33,7 @@ const { t, locale } = useI18n();
 // Locale-reactive labels
 const labels = computed(() => {
     // Explicitly depend on locale for reactivity
-    const _ = locale.value;
+    locale.value; // Force dependency
     return {
         searchPlaceholder: t('blog.posts.filters.search_placeholder') as string,
         allCategories: t('blog.posts.filters.all_categories') as string,
@@ -92,13 +92,13 @@ const sortOrderModel = computed<string>({
 
 // Active filters flag (for Clear button disabled state)
 const hasActiveFilters = computed<boolean>(() => {
-        return (
-            !!local.search ||
-            local.category !== null ||
-            (props.canFilterByStatus && !!local.status) ||
-            local.sort_by !== 'published_at' ||
-            local.sort_order !== 'desc'
-        );
+    return (
+        !!local.search ||
+        local.category !== null ||
+        (props.canFilterByStatus && !!local.status) ||
+        local.sort_by !== 'published_at' ||
+        local.sort_order !== 'desc'
+    );
 });
 
 function clearFilters() {
@@ -135,7 +135,7 @@ function clearFilters() {
                     <SelectItem value="_all">
                         <div class="flex items-center gap-2">{{ labels.allCategories }}</div>
                     </SelectItem>
-                                            <SelectItem v-for="category in categories" :key="category.id" :value="String(category.id)">
+                    <SelectItem v-for="category in categories" :key="category.id" :value="String(category.id)">
                         <div class="flex items-center gap-2">{{ category.name }}</div>
                     </SelectItem>
                 </SelectContent>
