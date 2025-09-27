@@ -6,10 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
+use Spatie\Translatable\HasTranslations;
 
 class BlogPost extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
+
+    public $translatable = ['title', 'slug', 'excerpt', 'content'];
 
     public const STATUS_DRAFT = 'draft';
     public const STATUS_PUBLISHED = 'published';
@@ -35,6 +38,10 @@ class BlogPost extends Model
     ];
 
     protected $casts = [
+        'title' => 'array',
+        'slug' => 'array',
+        'excerpt' => 'array',
+        'content' => 'array',
         'meta_data' => 'array',
         'published_at' => 'datetime',
         'views_count' => 'integer',
@@ -45,16 +52,101 @@ class BlogPost extends Model
         parent::boot();
 
         static::creating(function ($post) {
-            if (empty($post->slug)) {
-                $post->slug = Str::slug($post->title);
-            }
+            $post->generateSlugsForAllLocales();
         });
 
         static::updating(function ($post) {
-            if ($post->isDirty('title') && empty($post->slug)) {
-                $post->slug = Str::slug($post->title);
+            if ($post->isDirty('title')) {
+                $post->generateSlugsForAllLocales();
             }
         });
+    }
+
+    /**
+     * Generate slugs for all available locales
+     */
+    public function generateSlugsForAllLocales(): void
+    {
+        $availableLocales = array_keys(config('app.available_locales'));
+        $slugs = [];
+
+        foreach ($availableLocales as $locale) {
+            $title = $this->getTranslation('title', $locale);
+            if ($title) {
+                $slugs[$locale] = $this->generateUniqueSlug($title, $locale);
+            }
+        }
+
+        $this->slug = $slugs;
+    }
+
+    /**
+     * Generate unique slug for specific locale
+     */
+    private function generateUniqueSlug(string $title, string $locale): string
+    {
+        $baseSlug = Str::slug($title);
+        $slug = $baseSlug;
+        $counter = 1;
+
+        while ($this->slugExistsInLocale($slug, $locale)) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Check if slug exists in specific locale
+     */
+    private function slugExistsInLocale(string $slug, string $locale): bool
+    {
+        $query = static::query();
+        
+        if ($this->exists) {
+            $query->where('id', '!=', $this->id);
+        }
+        
+        // Use PostgreSQL JSON operators
+        if (config('database.default') === 'pgsql') {
+            return $query->whereRaw("slug->>? = ?", [$locale, $slug])->exists();
+        }
+        
+        // Fallback for SQLite
+        return $query->whereRaw("json_extract(slug, '$.{$locale}') = ?", [$slug])->exists();
+    }
+
+    /**
+     * Scope for ordering by localized title
+     */
+    public function scopeOrderByLocalizedTitle($query, ?string $locale = null, string $direction = 'asc')
+    {
+        $locale = $locale ?: app()->getLocale();
+        
+        // Use PostgreSQL JSON operators
+        if (config('database.default') === 'pgsql') {
+            return $query->orderByRaw("title->>? {$direction}", [$locale]);
+        }
+        
+        // Fallback for SQLite
+        return $query->orderByRaw("json_extract(title, '$.{$locale}') {$direction}");
+    }
+
+    /**
+     * Find post by slug in current locale
+     */
+    public static function findBySlug(string $slug, ?string $locale = null): ?self
+    {
+        $locale = $locale ?: app()->getLocale();
+        
+        // Use PostgreSQL JSON operators
+        if (config('database.default') === 'pgsql') {
+            return static::whereRaw("slug->>? = ?", [$locale, $slug])->first();
+        }
+        
+        // Fallback for SQLite
+        return static::whereRaw("json_extract(slug, '$.{$locale}') = ?", [$slug])->first();
     }
 
     public function user(): BelongsTo
@@ -101,7 +193,21 @@ class BlogPost extends Model
 
     public function getRouteKeyName(): string
     {
-        return 'slug';
+        return 'id';
+    }
+
+    /**
+     * Resolve route model binding for slug
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        // If it's numeric, treat as ID
+        if (is_numeric($value)) {
+            return $this->where('id', $value)->first();
+        }
+
+        // Otherwise treat as slug and search in current locale
+        return $this->findBySlug($value);
     }
 
     public function getReadingTimeAttribute(): int

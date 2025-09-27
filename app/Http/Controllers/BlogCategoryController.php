@@ -18,7 +18,7 @@ class BlogCategoryController extends Controller
         $this->authorize('viewAny', BlogCategory::class);
 
         $categories = BlogCategory::withCount('posts')
-            ->orderBy('name')
+            ->orderByLocalizedName()
             ->get();
 
         return Inertia::render('Blog/Categories/Index', [

@@ -40,29 +40,37 @@ class BlogPostFactory extends Factory
      */
     public function definition(): array
     {
-        $title = fake()->sentence(rand(3, 8));
         $publishedAt = fake()->boolean(75) ? fake()->dateTimeBetween('-1 year', 'now') : null;
         $status = $publishedAt ? 'published' : fake()->randomElement(['draft', 'published']);
 
-        // Generate realistic content with multiple paragraphs
-        $paragraphs = [];
-        $paragraphCount = fake()->numberBetween(3, 8);
+        // Generate multilingual titles
+        $titles = [
+            'ru' => fake('ru_RU')->sentence(rand(3, 8)),
+            'en' => fake('en_US')->sentence(rand(3, 8)),
+            'fr' => fake('fr_FR')->sentence(rand(3, 8)),
+        ];
 
-        for ($i = 0; $i < $paragraphCount; $i++) {
-            $sentences = fake()->numberBetween(3, 7);
-            $paragraphs[] = '<p>' . fake()->paragraph($sentences) . '</p>';
-        }
+        // Generate multilingual content
+        $content = [];
+        foreach (['ru', 'en', 'fr'] as $locale) {
+            $paragraphs = [];
+            $paragraphCount = fake()->numberBetween(3, 8);
 
-        // Add some code blocks occasionally
-        if (fake()->boolean(30)) {
-            $codeBlock = '<pre><code class="language-php">' .
-                fake()->randomElement([
-                    '<?php
+            for ($i = 0; $i < $paragraphCount; $i++) {
+                $sentences = fake()->numberBetween(3, 7);
+                $paragraphs[] = '<p>' . fake($locale === 'ru' ? 'ru_RU' : ($locale === 'fr' ? 'fr_FR' : 'en_US'))->paragraph($sentences) . '</p>';
+            }
+
+            // Add some code blocks occasionally
+            if (fake()->boolean(30)) {
+                $codeBlock = '<pre><code class="language-php">' .
+                    fake()->randomElement([
+                        '<?php
 
 function example() {
     return "Hello World!";
 }',
-                    '<?php
+                        '<?php
 
 class Example {
     public function method() {
@@ -70,28 +78,36 @@ class Example {
         return $this->data;
     }
 }',
-                    'npm install laravel-mix
+                        'npm install laravel-mix
 npm run dev',
-                ]) . '</code></pre>';
+                    ]) . '</code></pre>';
 
-            // Insert code block at random position
-            $insertAt = fake()->numberBetween(1, count($paragraphs) - 1);
-            array_splice($paragraphs, $insertAt, 0, $codeBlock);
+                // Insert code block at random position
+                $insertAt = fake()->numberBetween(1, count($paragraphs) - 1);
+                array_splice($paragraphs, $insertAt, 0, $codeBlock);
+            }
+
+            $content[$locale] = implode("\n\n", $paragraphs);
         }
-
-        $content = implode("\n\n", $paragraphs);
 
         return [
             'user_id' => User::factory(),
             'blog_category_id' => BlogCategory::factory(),
-            'title' => $title,
-            'slug' => null, // Will be auto-generated from title
-            'excerpt' => fake()->paragraph(3),
+            'title' => $titles,
+            'excerpt' => [
+                'ru' => fake('ru_RU')->paragraph(3),
+                'en' => fake('en_US')->paragraph(3),
+                'fr' => fake('fr_FR')->paragraph(3),
+            ],
             'content' => $content,
             'featured_image' => fake()->boolean(60) ? $this->generatePlaceholderImage() : null,
             'meta_data' => [
-                'meta_title' => $title,
-                'meta_description' => fake()->sentence(15),
+                'meta_title' => $titles,
+                'meta_description' => [
+                    'ru' => fake('ru_RU')->sentence(15),
+                    'en' => fake('en_US')->sentence(15),
+                    'fr' => fake('fr_FR')->sentence(15),
+                ],
                 'keywords' => fake()->words(5),
                 'author_bio' => fake()->sentence(),
             ],

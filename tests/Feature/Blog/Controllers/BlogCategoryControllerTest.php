@@ -62,11 +62,14 @@ test('admin can create category', function () {
     $response = $this->actingAs($this->admin)->post(route('blog.categories.store'), $categoryData);
     $response->assertRedirect();
 
-    $this->assertDatabaseHas('blog_categories', [
-        'name' => 'Test Category',
-        'color' => '#ff0000',
-        'is_active' => true
-    ]);
+    // Check that category was created
+    $category = BlogCategory::where('color', '#ff0000')
+        ->where('is_active', true)
+        ->first();
+    
+    expect($category)->not->toBeNull();
+    expect($category->name)->toBe('Test Category');
+    expect($category->slug)->toBe('test-category');
 });
 
 test('regular user cannot access edit category page', function () {
@@ -100,12 +103,14 @@ test('admin can update category', function () {
     $response = $this->actingAs($this->admin)->put(route('blog.categories.update', $this->category), $categoryData);
     $response->assertRedirect();
 
-    $this->assertDatabaseHas('blog_categories', [
-        'id' => $this->category->id,
-        'name' => 'Updated Category',
-        'color' => '#00ff00',
-        'is_active' => false
-    ]);
+    // Check that category was updated
+    $updatedCategory = BlogCategory::find($this->category->id);
+    
+    expect($updatedCategory)->not->toBeNull();
+    expect($updatedCategory->name)->toBe('Updated Category');
+    expect($updatedCategory->slug)->toBe('updated-category');
+    expect($updatedCategory->color)->toBe('#00ff00');
+    expect($updatedCategory->is_active)->toBe(false);
 });
 
 test('regular user cannot delete category', function () {

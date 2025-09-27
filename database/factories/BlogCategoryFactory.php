@@ -20,41 +20,43 @@ class BlogCategoryFactory extends Factory
     public function definition(): array
     {
         $categories = [
-            'Технологии',
-            'Веб-разработка',
-            'Мобильная разработка',
-            'Дизайн',
-            'DevOps',
-            'Искусственный интеллект',
-            'Базы данных',
-            'Безопасность',
-            'Тестирование',
-            'Управление проектами',
-            'Карьера в IT',
-            'Стартапы',
+            'ru' => [
+                'Технологии', 'Веб-разработка', 'Мобильная разработка', 'Дизайн', 'DevOps',
+                'Искусственный интеллект', 'Базы данных', 'Безопасность', 'Тестирование',
+                'Управление проектами', 'Карьера в IT', 'Стартапы',
+            ],
+            'en' => [
+                'Technology', 'Web Development', 'Mobile Development', 'Design', 'DevOps',
+                'Artificial Intelligence', 'Databases', 'Security', 'Testing',
+                'Project Management', 'IT Career', 'Startups',
+            ],
+            'fr' => [
+                'Technologie', 'Développement Web', 'Développement Mobile', 'Design', 'DevOps',
+                'Intelligence Artificielle', 'Bases de Données', 'Sécurité', 'Tests',
+                'Gestion de Projet', 'Carrière IT', 'Startups',
+            ],
         ];
 
         $colors = [
-            '#3B82F6', // Blue
-            '#EF4444', // Red
-            '#10B981', // Green
-            '#F59E0B', // Yellow
-            '#8B5CF6', // Purple
-            '#EC4899', // Pink
-            '#06B6D4', // Cyan
-            '#84CC16', // Lime
-            '#F97316', // Orange
-            '#6B7280', // Gray
+            '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
+            '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6B7280',
         ];
 
-        $name = fake()->unique()->randomElement($categories);
+        $index = fake()->unique()->numberBetween(0, count($categories['ru']) - 1);
 
         return [
-            'name' => $name,
-            'slug' => null, // Will be auto-generated from name
-            'description' => fake()->sentence(10, 20),
+            'name' => [
+                'ru' => $categories['ru'][$index],
+                'en' => $categories['en'][$index],
+                'fr' => $categories['fr'][$index],
+            ],
+            'description' => [
+                'ru' => fake('ru_RU')->sentence(10, 20),
+                'en' => fake('en_US')->sentence(10, 20),
+                'fr' => fake('fr_FR')->sentence(10, 20),
+            ],
             'color' => fake()->randomElement($colors),
-            'is_active' => fake()->boolean(85), // 85% chance of being active
+            'is_active' => fake()->boolean(85),
         ];
     }
 

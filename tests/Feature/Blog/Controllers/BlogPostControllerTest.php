@@ -51,10 +51,12 @@ test('admin can create post', function () {
     $response = $this->actingAs($this->admin)->post(route('blog.posts.store'), $postData);
     $response->assertRedirect();
 
-    $this->assertDatabaseHas('blog_posts', [
-        'title' => 'Test Post',
-        'user_id' => $this->admin->id
-    ]);
+    // Check that post was created
+    $post = BlogPost::where('user_id', $this->admin->id)->first();
+    
+    expect($post)->not->toBeNull();
+    expect($post->title)->toBe('Test Post');
+    expect($post->slug)->toBe('test-post');
 });
 
 test('author can delete their own post', function () {

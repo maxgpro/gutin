@@ -26,8 +26,13 @@ test('admin can create post with syntax highlighted code blocks', function () {
 
     $response->assertRedirect();
 
-    $post = BlogPost::where('title', 'JavaScript Tutorial')->first();
+    // Find post by checking non-JSON fields and then check title
+    $post = BlogPost::where('user_id', $this->admin->id)
+        ->where('blog_category_id', $this->category->id)
+        ->latest()
+        ->first();
     expect($post)->not->toBeNull();
+    expect($post->title)->toBe('JavaScript Tutorial');
     expect($post->content)->toContain('language-javascript');
     expect($post->content)->toContain('console.log');
 });
@@ -57,8 +62,14 @@ class Example {
 
     $response->assertRedirect();
 
-    $post = BlogPost::where('title', 'Multi-language Code Examples')->first();
+    // Find post by checking non-JSON fields and then check title
+    $post = BlogPost::where('user_id', $this->admin->id)
+        ->where('blog_category_id', $this->category->id)
+        ->orderBy('created_at', 'desc')
+        ->first();
     expect($post)->not->toBeNull();
+    expect($post->title)->toBe('Multi-language Code Examples');
+    expect($post->excerpt)->toBe('Examples in multiple programming languages');
     expect($post->content)->toContain('language-php');
     expect($post->content)->toContain('language-python');
     expect($post->content)->toContain('class Example');

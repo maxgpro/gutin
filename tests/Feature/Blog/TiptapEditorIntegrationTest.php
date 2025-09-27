@@ -26,11 +26,15 @@ test('admin can create post with HTML content from tiptap editor', function () {
 
     $response->assertRedirect();
 
-    $this->assertDatabaseHas('blog_posts', [
-        'title' => 'Rich Text Post',
-        'content' => $htmlContent,
-        'user_id' => $this->admin->id,
-    ]);
+    // Check that post was created
+    $post = BlogPost::where('user_id', $this->admin->id)
+        ->where('blog_category_id', $this->category->id)
+        ->latest()
+        ->first();
+    
+    expect($post)->not->toBeNull();
+    expect($post->title)->toBe('Rich Text Post');
+    expect($post->content)->toBe($htmlContent);
 });
 
 test('admin can update post with HTML content from tiptap editor', function () {
@@ -53,10 +57,11 @@ test('admin can update post with HTML content from tiptap editor', function () {
 
     $response->assertRedirect();
 
-    $this->assertDatabaseHas('blog_posts', [
-        'id' => $post->id,
-        'content' => $newHtmlContent
-    ]);
+    // Check that post was updated
+    $updatedPost = BlogPost::find($post->id);
+    
+    expect($updatedPost)->not->toBeNull();
+    expect($updatedPost->content)->toBe($newHtmlContent);
 });
 
 test('post content is properly displayed with HTML formatting', function () {
