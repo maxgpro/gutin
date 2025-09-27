@@ -30,21 +30,7 @@ const emit = defineEmits<{
 
 const { t, locale } = useI18n();
 
-// Locale-reactive labels
-const labels = computed(() => {
-    // Explicitly depend on locale for reactivity
-    locale.value; // Force dependency
-    return {
-        searchPlaceholder: t('blog.posts.filters.search_placeholder') as string,
-        allCategories: t('blog.posts.filters.all_categories') as string,
-        allStatuses: t('blog.posts.filters.all_statuses') as string,
-        sortPublishedDate: t('blog.posts.filters.sort.published_date') as string,
-        sortCreatedDate: t('blog.posts.filters.sort.created_date') as string,
-        newest: t('blog.posts.filters.sort_order.newest') as string,
-        oldest: t('blog.posts.filters.sort_order.oldest') as string,
-        clear: t('blog.posts.filters.clear') as string,
-    };
-});
+// Using t() directly in the template ensures labels react to locale changes without extra dependencies
 
 // Local copy to avoid mutating props directly
 const local = reactive<Filters>({ ...props.modelValue });
@@ -120,7 +106,7 @@ function clearFilters() {
             <!-- Search -->
             <div class="relative w-full">
                 <Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input v-model="local.search" :placeholder="labels.searchPlaceholder" class="min-w-md pl-10" />
+                <Input v-model="local.search" :placeholder="t('blog.posts.filters.search_placeholder')" class="min-w-md pl-10" />
             </div>
 
             <!-- Category Filter -->
@@ -128,12 +114,12 @@ function clearFilters() {
                 <SelectTrigger class="w-full whitespace-nowrap sm:w-min">
                     <div class="flex items-center gap-2">
                         <Tag class="h-4 w-4 text-muted-foreground" />
-                        <SelectValue :placeholder="labels.allCategories" />
+                        <SelectValue :placeholder="t('blog.posts.filters.all_categories')" />
                     </div>
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="_all">
-                        <div class="flex items-center gap-2">{{ labels.allCategories }}</div>
+                        <div class="flex items-center gap-2">{{ t('blog.posts.filters.all_categories') }}</div>
                     </SelectItem>
                     <SelectItem v-for="category in categories" :key="category.id" :value="String(category.id)">
                         <div class="flex items-center gap-2">{{ category.name }}</div>
@@ -146,12 +132,12 @@ function clearFilters() {
                 <SelectTrigger class="w-full whitespace-nowrap sm:w-min">
                     <div class="flex items-center gap-2">
                         <ListFilter class="h-4 w-4 text-muted-foreground" />
-                        <SelectValue :placeholder="labels.allStatuses" />
+                        <SelectValue :placeholder="t('blog.posts.filters.all_statuses')" />
                     </div>
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="_all">
-                        <div class="flex items-center gap-2">{{ labels.allStatuses }}</div>
+                        <div class="flex items-center gap-2">{{ t('blog.posts.filters.all_statuses') }}</div>
                     </SelectItem>
                     <SelectItem v-for="status in statuses" :key="status" :value="status">
                         <div class="flex items-center gap-2">
@@ -171,10 +157,10 @@ function clearFilters() {
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="published_at">
-                        <div class="flex items-center gap-2">{{ labels.sortPublishedDate }}</div>
+                        <div class="flex items-center gap-2">{{ t('blog.posts.filters.sort.published_date') }}</div>
                     </SelectItem>
                     <SelectItem value="created_at">
-                        <div class="flex items-center gap-2">{{ labels.sortCreatedDate }}</div>
+                        <div class="flex items-center gap-2">{{ t('blog.posts.filters.sort.created_date') }}</div>
                     </SelectItem>
                 </SelectContent>
             </Select>
@@ -191,13 +177,13 @@ function clearFilters() {
                     <SelectItem value="desc">
                         <div class="flex items-center gap-2">
                             <ArrowDownAZ class="h-4 w-4" />
-                            {{ labels.newest }}
+                            {{ t('blog.posts.filters.sort_order.newest') }}
                         </div>
                     </SelectItem>
                     <SelectItem value="asc">
                         <div class="flex items-center gap-2">
                             <ArrowUpZA class="h-4 w-4" />
-                            {{ labels.oldest }}
+                            {{ t('blog.posts.filters.sort_order.oldest') }}
                         </div>
                     </SelectItem>
                 </SelectContent>
@@ -206,7 +192,7 @@ function clearFilters() {
             <!-- Clear Filters Button -->
             <Button variant="outline" @click="clearFilters" :disabled="!hasActiveFilters" class="w-full whitespace-nowrap sm:w-min">
                 <X :size="20" class="h-4 w-4" />
-                {{ labels.clear }}
+                {{ t('blog.posts.filters.clear') }}
             </Button>
         </div>
     </div>

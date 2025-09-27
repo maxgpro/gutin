@@ -98,6 +98,7 @@ export interface BlogCategoriesIndexProps {
     canCreate: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface BlogCategoriesCreateProps {
     // Пустой интерфейс для создания категории
 }
