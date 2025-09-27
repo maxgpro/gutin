@@ -6,6 +6,7 @@
     "edit": "Edit",
     "create": "Create",
     "back": "Back",
+    "show": "Show",
     "loading": "Loading...",
     "search": "Search",
     "clear": "Clear",
@@ -57,6 +58,7 @@
       "views": "Views",
       "reading_time": "min read",
       "no_posts": "No posts yet",
+      "create_first": "Create Your First Post",
       "created_successfully": "Post created successfully",
       "updated_successfully": "Post updated successfully",
       "deleted_successfully": "Post deleted",
@@ -92,5 +94,9 @@
   "language": {
     "switch": "Switch Language",
     "current": "Current language: English"
+  },
+  "pagination": {
+    "showing": "Showing {from} to {to} of {total} result | Showing {from} to {to} of {total} results",
+    "entries": "entry | entries"
   }
 }

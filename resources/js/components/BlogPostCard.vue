@@ -4,13 +4,18 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import blog from '@/routes/blog';
 import { Clock, Eye } from 'lucide-vue-next';
+import { useI18n } from 'vue-i18n';
+import { useLocalizedField } from '@/composables/useTranslation';
 
+// Composables
+const { t } = useI18n();
+const { getLocalized } = useLocalizedField();
 
 interface BlogPost {
     id: number;
-    title: string;
-    slug: string;
-    excerpt: string | null;
+    title: Record<string, string> | string;
+    slug: Record<string, string> | string;
+    excerpt: Record<string, string> | string | null;
     featured_image: string | null;
     status: string;
     published_at: string | null;
@@ -22,8 +27,8 @@ interface BlogPost {
     };
     category: {
         id: number;
-        name: string;
-        slug: string;
+        name: Record<string, string> | string;
+        slug: Record<string, string> | string;
         color: string;
     };
 }
@@ -59,7 +64,7 @@ function getStatusVariant(status: string): "default" | "secondary" | "destructiv
 }
 
 function getStatusLabel(status: string): string {
-    return status.charAt(0).toUpperCase() + status.slice(1);
+    return t(`blog.posts.status_${status}`);
 }
 </script>
 
@@ -82,13 +87,13 @@ function getStatusLabel(status: string): string {
 <template>
     <Card class="flex h-full flex-col overflow-hidden">
         <div v-if="post.featured_image" class="relative h-48 overflow-hidden">
-            <img :src="post.featured_image" :alt="post.title" class="h-full w-full object-cover transition-transform hover:scale-105" />
+            <img :src="post.featured_image" :alt="getLocalized(post.title)" class="h-full w-full object-cover transition-transform hover:scale-105" />
             <div class="absolute top-3 left-3 flex gap-2">
                 <div
                     class="rounded-full px-2 py-1 text-xs font-medium text-white"
                     :style="{ backgroundColor: post.category.color }"
                 >
-                    {{ post.category.name }}
+                    {{ getLocalized(post.category.name) }}
                 </div>
                 <Badge 
                     v-if="post.status !== 'published'"
@@ -103,7 +108,7 @@ function getStatusLabel(status: string): string {
         <CardContent class="flex-1 p-6">
             <div v-if="!post.featured_image" class="mb-3 flex gap-2">
                 <Badge variant="secondary" :style="{ backgroundColor: post.category.color + '20', color: post.category.color }">
-                    {{ post.category.name }}
+                    {{ getLocalized(post.category.name) }}
                 </Badge>
                 <Badge 
                     v-if="post.status !== 'published'"
@@ -115,12 +120,12 @@ function getStatusLabel(status: string): string {
 
             <h3 class="mb-2 line-clamp-2 text-xl font-semibold">
                 <TextLink :href="blog.posts.show(post)" class="hover:text-primary">
-                    {{ post.title }}
+                    {{ getLocalized(post.title) }}
                 </TextLink>
             </h3>
 
-            <p v-if="post.excerpt" class="mb-4 line-clamp-3 text-muted-foreground">
-                {{ post.excerpt }}
+            <p v-if="getLocalized(post.excerpt)" class="mb-4 line-clamp-3 text-muted-foreground">
+                {{ getLocalized(post.excerpt) }}
             </p>
         </CardContent>
 
@@ -133,7 +138,7 @@ function getStatusLabel(status: string): string {
                 <div class="flex items-center gap-3">
                     <span class="flex items-center gap-1">
                         <Clock class="h-3 w-3" />
-                        {{ post.reading_time }}min
+                        {{ post.reading_time }} {{ t('blog.posts.reading_time') }}
                     </span>
                     <span class="flex items-center gap-1">
                         <Eye class="h-3 w-3" />

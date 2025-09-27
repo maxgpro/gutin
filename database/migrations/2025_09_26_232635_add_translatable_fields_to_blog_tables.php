@@ -18,13 +18,13 @@ return new class extends Migration
             $table->dropColumn(['name', 'slug', 'description']);
             
             // Add JSON columns for translations
-            $table->json('name')->after('id');
-            $table->json('slug')->after('name');
-            $table->json('description')->nullable()->after('slug');
+            $table->jsonb('name')->after('id');
+            $table->jsonb('slug')->after('name');
+            $table->jsonb('description')->nullable()->after('slug');
         });
         
-        // Create GIN index for JSON fields using raw SQL
-        DB::statement('CREATE INDEX blog_categories_slug_gin ON blog_categories USING GIN (slug);');
+        // Create GIN index for JSON fields using raw SQL (PostgreSQL compatible)
+        DB::statement('CREATE INDEX blog_categories_slug_gin ON blog_categories USING GIN (slug jsonb_path_ops);');
 
         Schema::table('blog_posts', function (Blueprint $table) {
             // Drop existing non-JSON columns and constraints
@@ -32,14 +32,14 @@ return new class extends Migration
             $table->dropColumn(['title', 'slug', 'excerpt', 'content']);
             
             // Add JSON columns for translations
-            $table->json('title')->after('blog_category_id');
-            $table->json('slug')->after('title');
-            $table->json('excerpt')->nullable()->after('slug');
-            $table->json('content')->after('excerpt');
+            $table->jsonb('title')->after('blog_category_id');
+            $table->jsonb('slug')->after('title');
+            $table->jsonb('excerpt')->nullable()->after('slug');
+            $table->jsonb('content')->after('excerpt');
         });
         
-        // Create GIN index for JSON fields using raw SQL
-        DB::statement('CREATE INDEX blog_posts_slug_gin ON blog_posts USING GIN (slug);');
+        // Create GIN index for JSON fields using raw SQL (PostgreSQL compatible)
+        DB::statement('CREATE INDEX blog_posts_slug_gin ON blog_posts USING GIN (slug jsonb_path_ops);');
     }
 
     /**

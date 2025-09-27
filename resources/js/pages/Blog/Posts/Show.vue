@@ -10,20 +10,26 @@ import { type BlogPostsShowProps } from '@/types/blog';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Clock, Eye, SquarePen, Trash2 } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useLocalizedField } from '@/composables/useTranslation';
+
+// Composables  
+const { t } = useI18n();
+const { getLocalized } = useLocalizedField();
 
 const props = defineProps<BlogPostsShowProps>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Dashboard',
+        title: t('navigation.dashboard'),
         href: dashboard().url,
     },
     {
-        title: 'Blog Posts',
+        title: t('blog.posts.title'),
         href: blog.posts.index().url,
     },
     {
-        title: props.post.category.name,
+        title: getLocalized(props.post.category.name),
         href: blog.categories.show(props.post.category).url,
     },
 ];
@@ -48,14 +54,15 @@ function formatDate(dateString: string | null): string {
 }
 
 function deletePost() {
-    if (confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+    const postTitle = getLocalized(props.post.title);
+    if (confirm(t('messages.confirm_delete') + ` "${postTitle}"?`)) {
         router.delete(blog.posts.destroy(props.post).url);
     }
 }
 </script>
 
 <template>
-    <Head :title="post.title" />
+    <Head :title="getLocalized(post.title)" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -63,11 +70,11 @@ function deletePost() {
             <header class="mb-8">
                 <div class="mb-4">
                     <Badge variant="secondary" :style="{ backgroundColor: post.category.color + '20', color: post.category.color }">
-                        {{ post.category.name }}
+                        {{ getLocalized(post.category.name) }}
                     </Badge>
                 </div>
 
-                <h1 class="mb-4 text-4xl font-bold">{{ post.title }}</h1>
+                <h1 class="mb-4 text-4xl font-bold">{{ getLocalized(post.title) }}</h1>
 
                 <div class="flex items-center justify-between border-b pb-6 text-sm text-muted-foreground">
                     <div class="flex items-center gap-4">
@@ -75,27 +82,27 @@ function deletePost() {
                         <span>{{ formatDate(post.published_at) }}</span>
                         <span class="flex items-center gap-1">
                             <Clock class="h-4 w-4" />
-                            {{ post.reading_time }} min read
+                            {{ post.reading_time }} {{ t('blog.posts.reading_time') }}
                         </span>
                     </div>
                     <div class="flex items-center gap-4">
                         <span class="flex items-center gap-1">
                             <Eye class="h-4 w-4" />
-                            {{ post.views_count }} views
+                            {{ post.views_count }} {{ t('blog.posts.views') }}
                         </span>
 
                         <!-- Edit button for author/admin -->
                         <Button v-if="canEdit" variant="outline" as-child size="sm">
                             <Link :href="blog.posts.edit(post).url">
                                 <SquarePen :size="20" stroke-width="1.5" class="mr-2" />
-                                Edit
+                                {{ t('common.edit') }}
                             </Link>
                         </Button>
 
                         <!-- Delete button for author/admin -->
                         <Button v-if="canDelete" variant="destructive" size="sm" @click="deletePost">
                             <Trash2 :size="20" stroke-width="1.5" class="mr-2" />
-                            Delete
+                            {{ t('common.delete') }}
                         </Button>
                     </div>
                 </div>
@@ -103,14 +110,14 @@ function deletePost() {
 
             <!-- Featured Image -->
             <div v-if="post.featured_image" class="mb-8">
-                <img :src="post.featured_image" :alt="post.title" class="h-64 w-full rounded-lg object-cover sm:h-96" />
+                <img :src="post.featured_image" :alt="getLocalized(post.title)" class="h-64 w-full rounded-lg object-cover sm:h-96" />
             </div>
 
             <!-- Article Content -->
             <article
                 class="prose prose-lg prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground mb-12 max-w-none"
             >
-                <div v-html="post.content" class="tiptap-content"></div>
+                <div v-html="getLocalized(post.content)" class="tiptap-content"></div>
             </article>
 
             <!-- Related Posts -->

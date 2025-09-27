@@ -2,10 +2,10 @@
 
 export interface BlogPost {
     id: number;
-    title: string;
-    slug: string;
-    excerpt: string | null;
-    content?: string; // Доступно только на странице просмотра
+    title: Record<string, string> | string;
+    slug: Record<string, string> | string;
+    excerpt: Record<string, string> | string | null;
+    content?: Record<string, string> | string; // Доступно только на странице просмотра
     featured_image: string | null;
     status: string;
     published_at: string | null;
@@ -19,18 +19,18 @@ export interface BlogPost {
     };
     category: {
         id: number;
-        name: string;
-        slug: string;
+        name: Record<string, string> | string;
+        slug: Record<string, string> | string;
         color: string;
     };
 }
 
 export interface BlogCategory {
     id: number;
-    name: string;
-    slug: string;
+    name: Record<string, string> | string;
+    slug: Record<string, string> | string;
     color: string;
-    description?: string | null;
+    description?: Record<string, string> | string | null;
     is_active?: boolean;
     posts_count?: number;
 }

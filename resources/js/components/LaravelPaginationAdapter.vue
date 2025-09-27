@@ -4,6 +4,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { paginationConfig } from '@/config/pagination';
 import { router } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+// Composables
+const { t } = useI18n();
 
 const props = defineProps<{
     total: number;
@@ -76,7 +80,7 @@ function changePerPage(perPage: number) {
             <!-- Per Page Selector -->
             <div v-if="showPerPageSelector" 
                 class="flex items-center gap-2 text-sm text-muted-foreground justify-center sm:justify-start">
-                <span>Show</span>
+                <span>{{ t('common.show') }}</span>
                 <Select v-model="perPageModel">
                     <SelectTrigger class="w-20">
                         <SelectValue />
@@ -87,7 +91,7 @@ function changePerPage(perPage: number) {
                         </SelectItem>
                     </SelectContent>
                 </Select>
-                <span>entries</span>
+                <span>{{ t('pagination.entries', {}, perPage) }}</span>
             </div>
 
             <!-- Pagination -->
@@ -120,7 +124,7 @@ function changePerPage(perPage: number) {
                 v-if="showResultsCount && total > 0 && from && to"
                 class="flex items-center justify-center gap-2 text-sm text-muted-foreground sm:justify-end"
             >
-                Showing {{ from }} to {{ to }} of {{ total }} results
+                {{ t('pagination.showing', { from, to, total }, total) }}
             </div>
         </div>
     </div>

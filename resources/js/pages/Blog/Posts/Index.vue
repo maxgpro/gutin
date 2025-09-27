@@ -13,14 +13,18 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import { ArrowDownAZ, ArrowDownUp, ArrowUpZA, Calendar, ListFilter, Search, Tag, FileText, X, Plus } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+// Composables
+const { t } = useI18n();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Dashboard',
+        title: t('navigation.dashboard'),
         href: dashboard().url,
     },
     {
-        title: 'Blog Posts',
+        title: t('blog.posts.title'),
         href: blog.posts.index().url,
     },
 ];
@@ -282,9 +286,9 @@ function clearFilters() {
 
             <div v-else class="py-12 text-center">
                 <FileText :size="20" class="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-                <p class="text-lg text-muted-foreground">No blog posts found.</p>
+                <p class="text-lg text-muted-foreground">{{ t('blog.posts.no_posts') }}</p>
                 <Button v-if="canCreate" as-child class="mt-4">
-                    <Link :href="blog.posts.create().url">Create Your First Post</Link>
+                    <Link :href="blog.posts.create().url">{{ t('blog.posts.create_first') }}</Link>
                 </Button>
             </div>
 

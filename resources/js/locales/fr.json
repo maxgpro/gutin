@@ -6,6 +6,7 @@
     "edit": "Modifier",
     "create": "Créer",
     "back": "Retour",
+    "show": "Afficher",
     "loading": "Chargement...",
     "search": "Rechercher",
     "clear": "Effacer",
@@ -57,6 +58,7 @@
       "views": "Vues",
       "reading_time": "min de lecture",
       "no_posts": "Aucun article pour l'instant",
+      "create_first": "Créer votre premier article",
       "created_successfully": "Article créé avec succès",
       "updated_successfully": "Article mis à jour avec succès",
       "deleted_successfully": "Article supprimé",
@@ -92,5 +94,9 @@
   "language": {
     "switch": "Changer de langue",
     "current": "Langue actuelle : Français"
+  },
+  "pagination": {
+    "showing": "Affichage de {from} à {to} sur {total} résultat | Affichage de {from} à {to} sur {total} résultats",
+    "entries": "entrée | entrées"
   }
 }
