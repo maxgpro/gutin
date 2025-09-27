@@ -13,23 +13,16 @@ class LocaleController extends Controller
      * Switch application locale
      * Handles both AJAX and regular form requests
      */
-    public function switch(LocaleSwitchRequest $request): JsonResponse | RedirectResponse
+    public function switch(LocaleSwitchRequest $request): JsonResponse|RedirectResponse
     {
         $locale = $request->validated('locale');
         
         Session::put('locale', $locale);
         
-        
-        // todo: delete loging
-        \Log::info("Locale switched to: {$locale}");
-        
-        // Return JSON for AJAX requests, redirect for regular forms
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'locale' => $locale,
-                'message' => "Language switched to {$locale}"
-            ]);
+        // For Inertia requests, respond with a redirect so the client re-visits the current route
+        // Use 303 See Other to ensure the subsequent request is a GET (recommended for POST form submissions)
+        if ($request->header('X-Inertia')) {
+            return redirect()->back(status: 303);
         }
         
         return redirect()->back()->with('success', "Language switched to {$locale}");

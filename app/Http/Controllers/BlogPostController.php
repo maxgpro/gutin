@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
 use App\Services\BlogPostService;
+use App\Http\Resources\BlogPostResource;
+use App\Http\Resources\BlogCategoryResource;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Http\Requests\Blog\BlogPostIndexRequest;
 use App\Http\Requests\Blog\BlogPostStoreRequest;
@@ -27,8 +29,9 @@ class BlogPostController extends Controller
         $user = Auth::user();
 
         return Inertia::render('Blog/Posts/Index', [
-            'posts' => $posts,
-            'categories' => $categories,
+            'posts' => $posts->through(fn ($post) => BlogPostResource::make($post)->toArray(request())),
+            // Для фильтра по категориям достаточно локализованных значений
+            'categories' => BlogCategoryResource::collection($categories)->toArray(request()),
             'filters' => $request->only(['status', 'category', 'search', 'sort_by', 'sort_order']),
             'statuses' => BlogPost::STATUSES,
             'canCreate' => $user ? Gate::allows('create', BlogPost::class) : false,
@@ -43,7 +46,8 @@ class BlogPostController extends Controller
         $categories = $this->blogPostService->getActiveCategories();
 
         return Inertia::render('Blog/Posts/Create', [
-            'categories' => $categories,
+            // Для формы создания списка категорий достаточно локализованных названий
+            'categories' => BlogCategoryResource::collection($categories)->toArray(request()),
         ]);
     }
 
@@ -71,8 +75,8 @@ class BlogPostController extends Controller
         $relatedPosts = $this->blogPostService->getRelatedPosts($post);
 
         return Inertia::render('Blog/Posts/Show', [
-            'post' => $post,
-            'relatedPosts' => $relatedPosts,
+            'post' => BlogPostResource::make($post)->toArray(request()),
+            'relatedPosts' => BlogPostResource::collection($relatedPosts)->toArray(request()),
             'canEdit' => Auth::user() ? Gate::allows('update', $post) : false,
             'canDelete' => Auth::user() ? Gate::allows('delete', $post) : false,
         ]);
@@ -85,8 +89,20 @@ class BlogPostController extends Controller
         $categories = $this->blogPostService->getActiveCategories();
 
         return Inertia::render('Blog/Posts/Edit', [
-            'post' => $post,
-            'categories' => $categories,
+            // Для формы редактирования нужен полный набор переводов поста
+            'post' => [
+                'id' => $post->id,
+                'title' => $post->getTranslations('title'),
+                'slug' => $post->getTranslations('slug'),
+                'excerpt' => $post->getTranslations('excerpt'),
+                'content' => $post->getTranslations('content'),
+                'blog_category_id' => $post->blog_category_id,
+                'featured_image' => $post->featured_image,
+                'status' => $post->status,
+                'published_at' => optional($post->published_at)->toDateTimeString(),
+            ],
+            // и локализованные категории для селекта
+            'categories' => BlogCategoryResource::collection($categories),
         ]);
     }
 

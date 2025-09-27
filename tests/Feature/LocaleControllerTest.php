@@ -11,15 +11,13 @@ test('it switches locale with valid locale', function () {
     expect(Session::get('locale'))->toBe('ru');
 });
 
-test('it returns json for ajax requests', function () {
-    $response = $this->postJson('/locale/switch', [
+// In Inertia-only mode we expect redirects rather than JSON responses
+test('it redirects on locale switch requests', function () {
+    $response = $this->post('/locale/switch', [
         'locale' => 'en'
     ]);
 
-    $response->assertJson([
-        'success' => true,
-        'locale' => 'en'
-    ]);
+    $response->assertRedirect();
     expect(Session::get('locale'))->toBe('en');
 });
 
@@ -38,13 +36,13 @@ test('it requires locale parameter', function () {
 });
 
 test('it throttles requests', function () {
-    // Make 10 requests (within limit)
+    // Make 10 requests (within limit) using regular POST (Inertia-like behavior)
     for ($i = 0; $i < 10; $i++) {
-        $response = $this->postJson('/locale/switch', ['locale' => 'en']);
-        $response->assertSuccessful();
+        $response = $this->post('/locale/switch', ['locale' => 'en']);
+        $response->assertRedirect();
     }
 
-    // 11th request should be throttled
+    // 11th request should be throttled — middleware returns JSON 429
     $response = $this->postJson('/locale/switch', ['locale' => 'ru']);
     $response->assertStatus(429);
     $response->assertJsonStructure(['message', 'retry_after']);
@@ -54,13 +52,11 @@ test('it accepts all configured locales', function () {
     $availableLocales = array_keys(config('app.available_locales'));
 
     foreach ($availableLocales as $locale) {
-        $response = $this->postJson('/locale/switch', [
+        $response = $this->post('/locale/switch', [
             'locale' => $locale
         ]);
 
-        $response->assertJson([
-            'success' => true,
-            'locale' => $locale
-        ]);
+        $response->assertRedirect();
+        expect(Session::get('locale'))->toBe($locale);
     }
 });

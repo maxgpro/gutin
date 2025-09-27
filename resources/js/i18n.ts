@@ -1,3 +1,4 @@
+import { router } from '@inertiajs/vue3';
 import { createI18n } from 'vue-i18n';
 
 // Import locale messages
@@ -40,48 +41,19 @@ export function switchLocale(locale: string) {
         // Save to localStorage for persistence
         localStorage.setItem('preferred-locale', locale);
 
-        // todo: refactor to inertia
-        // Send request to backend to update session locale using Inertia
-        // import('@inertiajs/vue3').then(({ router }) => {
-        //   router.post('/locale/switch', { locale }, {
-        //     preserveState: true,
-        //     preserveScroll: true,
-        //     onError: (errors) => {
-        //       console.error('Failed to switch locale on backend:', errors)
-        //     }
-        //   })
-        // }).catch(console.error)
-
-        // Send request to backend to update session locale
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-        if (csrfToken) {
-            fetch('/locale/switch', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest',
+        // Update session locale on backend and refresh the current Inertia page
+        // Controller responds with redirect()->back(), so Inertia will re-visit the current route
+        router.post(
+            '/locale/switch',
+            { locale },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onError: (errors) => {
+                    console.error('Failed to switch locale on backend:', errors);
                 },
-                body: JSON.stringify({ locale }),
-                credentials: 'same-origin',
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log('Locale switched successfully:', data);
-                })
-                .catch((error) => {
-                    console.error('Failed to switch locale on backend:', error);
-                });
-        } else {
-            console.error('CSRF token not found');
-        }
+            },
+        );
     }
 }
 
@@ -89,7 +61,18 @@ export function switchLocale(locale: string) {
 export function initializeLocale() {
     const savedLocale = localStorage.getItem('preferred-locale');
     if (savedLocale && availableLocales.some((l) => l.code === savedLocale)) {
-        switchLocale(savedLocale);
+        const htmlLocale = document.documentElement.lang || 'en';
+
+        // If the saved locale already matches the current HTML/lang (session-driven),
+        // just align the frontend i18n locale without hitting the backend.
+        if (savedLocale === htmlLocale) {
+            i18n.global.locale.value = savedLocale as 'ru' | 'en' | 'fr';
+            return;
+        }
+
+        // Defer the backend switch until after the app is mounted to avoid
+        // calling Inertia router before it's fully initialized.
+        requestAnimationFrame(() => switchLocale(savedLocale));
     }
 }
 

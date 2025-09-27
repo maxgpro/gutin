@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogCategory;
+use App\Http\Resources\BlogCategoryResource;
+use App\Http\Resources\BlogPostResource;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Http\Requests\Blog\BlogCategoryStoreRequest;
 use App\Http\Requests\Blog\BlogCategoryUpdateRequest;
@@ -22,7 +24,7 @@ class BlogCategoryController extends Controller
             ->get();
 
         return Inertia::render('Blog/Categories/Index', [
-            'categories' => $categories,
+            'categories' => BlogCategoryResource::collection($categories)->toArray(request()),
             'canCreate' => Auth::user() ? Gate::allows('create', BlogCategory::class) : false,
         ]);
     }
@@ -51,7 +53,13 @@ class BlogCategoryController extends Controller
         }]);
 
         return Inertia::render('Blog/Categories/Show', [
-            'category' => $category,
+            'category' => array_merge(
+                BlogCategoryResource::make($category)->toArray(request()),
+                [
+                    // Локализованные посты категории
+                    'posts' => BlogPostResource::collection($category->posts)->toArray(request()),
+                ]
+            ),
         ]);
     }
 
@@ -59,7 +67,16 @@ class BlogCategoryController extends Controller
     {
         // Админский middleware уже проверил права
         return Inertia::render('Blog/Categories/Edit', [
-            'category' => $category,
+            // Для формы редактирования удобнее отдать все переводы
+            // чтобы сохранить возможность локализованного ввода на фронте при необходимости
+            'category' => [
+                'id' => $category->id,
+                'name' => $category->getTranslations('name'),
+                'slug' => $category->getTranslations('slug'),
+                'description' => $category->getTranslations('description'),
+                'color' => $category->color,
+                'is_active' => $category->is_active,
+            ],
         ]);
     }
 
