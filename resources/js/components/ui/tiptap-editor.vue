@@ -87,7 +87,8 @@ const editor = useEditor({
       defaultLanguage: 'javascript',
     }),
     Placeholder.configure({
-      placeholder: props.placeholder,
+      // Use a function so it reads the latest prop value
+      placeholder: () => props.placeholder,
     }),
     TextAlign.configure({
       types: ['heading', 'paragraph'],
@@ -302,13 +303,12 @@ watch(() => props.modelValue, (newValue) => {
   }
 })
 
-// Watch for placeholder changes
-watch(() => props.placeholder, (newPlaceholder) => {
+// Watch for placeholder changes and force a view update so decorations recompute
+watch(() => props.placeholder, () => {
   if (editor.value) {
-    const placeholderExt = editor.value.extensionManager.extensions.find(ext => ext.name === 'placeholder')
-    if (placeholderExt) {
-      placeholderExt.options.placeholder = newPlaceholder
-    }
+    // Trigger a no-op transaction to make plugins re-run and pick up the new placeholder value
+    const { state, view } = editor.value
+    view.updateState(state)
   }
 })
 

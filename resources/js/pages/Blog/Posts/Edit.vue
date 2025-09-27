@@ -14,29 +14,35 @@ import blog from '@/routes/blog';
 import { type BreadcrumbItem } from '@/types';
 import { type BlogPostsEditProps } from '@/types/blog';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useLocalizedField } from '@/composables/useTranslation';
 
 const props = defineProps<BlogPostsEditProps>();
+const { getLocalized } = useLocalizedField();
+const { t, locale } = useI18n();
+const localizedTitle = computed(() => getLocalized(props.post.title, undefined, ''));
 
-const breadcrumbs: BreadcrumbItem[] = [
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     {
-        title: 'Dashboard',
+        title: t('navigation.dashboard'),
         href: dashboard().url,
     },
     {
-        title: 'Blog Posts',
+        title: t('blog.posts.title'),
         href: blog.posts.index().url,
     },
     {
-        title: props.post.title,
+        title: localizedTitle.value,
         href: blog.posts.show(props.post).url,
     },
-];
+]);
 
 const form = useForm({
-    title: props.post.title || '',
-    slug: props.post.slug || '',
-    excerpt: props.post.excerpt || '',
-    content: props.post.content || '',
+    title: getLocalized(props.post.title, undefined, ''),
+    slug: getLocalized(props.post.slug, undefined, ''),
+    excerpt: getLocalized(props.post.excerpt, undefined, ''),
+    content: getLocalized(props.post.content, undefined, ''),
     blog_category_id: props.post.blog_category_id?.toString() || '',
     featured_image: props.post.featured_image || '',
     status: props.post.status || 'draft',
@@ -46,10 +52,18 @@ const form = useForm({
 function submit() {
     form.put(blog.posts.update(props.post).url);
 }
+
+// When locale changes, rehydrate form fields with that locale values
+watch(locale, (newLocale) => {
+    form.title = getLocalized(props.post.title, newLocale, '');
+    form.slug = getLocalized(props.post.slug, newLocale, '');
+    form.excerpt = getLocalized(props.post.excerpt, newLocale, '');
+    form.content = getLocalized(props.post.content, newLocale, '');
+});
 </script>
 
 <template>
-    <Head :title="`Edit: ${post.title}`" />
+    <Head :title="`${t('blog.posts.edit')}: ${localizedTitle}`" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -59,27 +73,27 @@ function submit() {
                     <div class="space-y-6 md:col-span-2">
                         <h2 class="flex items-center gap-2">
                             <Icon name="edit" class="h-5 w-5" />
-                            Edit Blog Post
+                            {{ t('blog.posts.edit') }}
                         </h2>
                         <!-- Title -->
                         <div>
-                            <Label for="title">Title</Label>
+                            <Label for="title">{{ t('blog.posts.title_field') }}</Label>
                             <Input id="title" v-model="form.title" type="text" class="mt-1" required />
                             <InputError class="mt-2" :message="form.errors.title" />
                         </div>
 
                         <!-- Slug -->
                         <div>
-                            <Label for="slug">Slug</Label>
+                            <Label for="slug">{{ t('blog.posts.slug') }}</Label>
                             <Input id="slug" v-model="form.slug" type="text" class="mt-1" />
-                            <p class="mt-1 text-sm text-muted-foreground">Leave empty to auto-generate from title</p>
+                            <p class="mt-1 text-sm text-muted-foreground">{{ t('blog.posts.leave_empty_to_autogenerate_from_title') }}</p>
                             <InputError class="mt-2" :message="form.errors.slug" />
                         </div>
 
                         <!-- Excerpt -->
                         <div>
-                            <Label for="excerpt">Excerpt</Label>
-                            <Textarea id="excerpt" v-model="form.excerpt" rows="3" class="mt-1" placeholder="Brief description of the post..." />
+                            <Label for="excerpt">{{ t('blog.posts.excerpt') }}</Label>
+                            <Textarea id="excerpt" v-model="form.excerpt" rows="3" class="mt-1" :placeholder="t('blog.posts.excerpt_placeholder')" />
                             <InputError class="mt-2" :message="form.errors.excerpt" />
                         </div>
                     </div>
@@ -88,19 +102,19 @@ function submit() {
                     <div class="space-y-6">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Publish Settings</CardTitle>
+                                <CardTitle>{{ t('blog.posts.publish_settings') }}</CardTitle>
                             </CardHeader>
                             <CardContent class="space-y-4">
                                 <!-- Status -->
                                 <div>
-                                    <Label for="status">Status</Label>
+                                    <Label for="status">{{ t('blog.posts.status') }}</Label>
                                     <Select v-model="form.status">
                                         <SelectTrigger class="mt-1">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="draft">Draft</SelectItem>
-                                            <SelectItem value="published">Published</SelectItem>
+                                            <SelectItem value="draft">{{ t('blog.posts.status_draft') }}</SelectItem>
+                                            <SelectItem value="published">{{ t('blog.posts.status_published') }}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <InputError class="mt-2" :message="form.errors.status" />
@@ -108,7 +122,7 @@ function submit() {
 
                                 <!-- Published At (only show if published) -->
                                 <div v-if="form.status === 'published'">
-                                    <Label for="published_at">Published At</Label>
+                                    <Label for="published_at">{{ t('blog.posts.published_at') }}</Label>
                                     <Input
                                         id="published_at"
                                         v-model="form.published_at"
@@ -120,10 +134,10 @@ function submit() {
 
                                 <!-- Category -->
                                 <div>
-                                    <Label for="category">Category</Label>
+                                    <Label for="category">{{ t('blog.posts.category') }}</Label>
                                     <Select v-model="form.blog_category_id">
                                         <SelectTrigger class="mt-1">
-                                            <SelectValue placeholder="Select a category" />
+                                            <SelectValue :placeholder="t('blog.posts.select_category')" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem v-for="category in categories" :key="category.id" :value="String(category.id)">
@@ -136,7 +150,7 @@ function submit() {
 
                                 <!-- Featured Image -->
                                 <div>
-                                    <Label for="featured_image">Featured Image URL</Label>
+                                    <Label for="featured_image">{{ t('blog.posts.featured_image_url') }}</Label>
                                     <Input
                                         id="featured_image"
                                         v-model="form.featured_image"
@@ -153,11 +167,11 @@ function submit() {
 
                 <!-- Content -->
                 <div>
-                    <Label for="content">Content</Label>
+                    <Label for="content">{{ t('blog.posts.content') }}</Label>
                     <div class="mt-1">
                         <TiptapEditor
                             v-model="form.content"
-                            placeholder="Write your blog post content here..."
+                            :placeholder="t('blog.posts.content_placeholder')"
                             :class="{ 'border-destructive': form.errors.content }"
                         />
                     </div>
@@ -167,12 +181,12 @@ function submit() {
                 <!-- Actions -->
                 <div class="flex items-center justify-between">
                     <Button type="button" variant="outline" as-child>
-                        <Link :href="blog.posts.show(post).url">Cancel</Link>
+                        <Link :href="blog.posts.show(post).url">{{ t('common.cancel') }}</Link>
                     </Button>
                     <Button type="submit" :disabled="form.processing">
                         <Icon v-if="form.processing" name="loader-2" class="mr-2 h-4 w-4 animate-spin" />
                         <Icon v-else name="save" class="mr-2 h-4 w-4" />
-                        {{ form.processing ? 'Updating...' : 'Update' }}
+                        {{ form.processing ? t('common.updating') : t('common.save') }}
                     </Button>
                 </div>
             </form>

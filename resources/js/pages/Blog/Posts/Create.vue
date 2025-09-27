@@ -14,21 +14,24 @@ import blog from '@/routes/blog';
 import { type BreadcrumbItem } from '@/types';
 import { type BlogPostsCreateProps } from '@/types/blog';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-const breadcrumbs: BreadcrumbItem[] = [
+const { t } = useI18n();
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     {
-        title: 'Dashboard',
+        title: t('navigation.dashboard'),
         href: dashboard().url,
     },
     {
-        title: 'Blog Posts',
+        title: t('blog.posts.title'),
         href: blog.posts.index().url,
     },
     {
-        title: 'Create Post',
+        title: t('blog.posts.create'),
         href: blog.posts.create().url,
     },
-];
+]);
 
 const props = defineProps<BlogPostsCreateProps>();
 
@@ -49,7 +52,7 @@ function submit() {
 </script>
 
 <template>
-    <Head title="Create Blog Post" />
+    <Head :title="t('blog.posts.create')" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -59,16 +62,16 @@ function submit() {
                     <div class="space-y-6 md:col-span-2">
                         <h2 class="flex items-center gap-2">
                             <Icon name="edit" class="h-5 w-5" />
-                            New Blog Post
+                            {{ t('blog.posts.create') }}
                         </h2>
                         <!-- Title -->
                         <div>
-                            <Label for="title">Title *</Label>
+                            <Label for="title">{{ t('blog.posts.title_field') }} *</Label>
                             <Input
                                 id="title"
                                 v-model="form.title"
                                 type="text"
-                                placeholder="Enter post title..."
+                                :placeholder="t('blog.posts.title_field')"
                                 :class="['mt-1', { 'border-destructive': form.errors.title }]"
                                 required
                             />
@@ -77,24 +80,24 @@ function submit() {
 
                         <!-- Slug -->
                         <div>
-                            <Label for="slug">Slug</Label>
+                            <Label for="slug">{{ t('blog.posts.slug') }}</Label>
                             <Input
                                 id="slug"
                                 v-model="form.slug"
-                                placeholder="Auto-generated from title"
+                                :placeholder="t('blog.posts.leave_empty_to_autogenerate_from_title')"
                                 :class="['mt-1', { 'border-destructive': form.errors.slug }]"
                             />
-                            <p class="mt-1 text-sm text-muted-foreground">Leave empty to auto-generate from title</p>
+                            <p class="mt-1 text-sm text-muted-foreground">{{ t('blog.posts.leave_empty_to_autogenerate_from_title') }}</p>
                             <InputError :message="form.errors.slug" />
                         </div>
 
                         <!-- Excerpt -->
                         <div>
-                            <Label for="excerpt">Excerpt</Label>
+                            <Label for="excerpt">{{ t('blog.posts.excerpt') }}</Label>
                             <Textarea
                                 id="excerpt"
                                 v-model="form.excerpt"
-                                placeholder="Brief description of the post..."
+                                :placeholder="t('blog.posts.excerpt_placeholder')"
                                 rows="3"
                                 :class="['mt-1', { 'border-destructive': form.errors.excerpt }]"
                             />
@@ -106,20 +109,20 @@ function submit() {
                     <div class="space-y-6">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Publish Settings</CardTitle>
+                                <CardTitle>{{ t('blog.posts.publish_settings') }}</CardTitle>
                             </CardHeader>
                             <CardContent class="space-y-4">
                                 <!-- Status -->
                                 <div>
-                                    <Label for="status">Status</Label>
+                                    <Label for="status">{{ t('blog.posts.status') }}</Label>
                                     <Select v-model="form.status">
                                         <SelectTrigger class="mt-1">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="draft">Draft</SelectItem>
-                                            <SelectItem value="published">Published</SelectItem>
-                                            <SelectItem value="archived">Archived</SelectItem>
+                                            <SelectItem value="draft">{{ t('blog.posts.status_draft') }}</SelectItem>
+                                            <SelectItem value="published">{{ t('blog.posts.status_published') }}</SelectItem>
+                                            <SelectItem value="archived">{{ t('blog.posts.status_archived') }}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <InputError :message="form.errors.status" />
@@ -127,7 +130,7 @@ function submit() {
 
                                 <!-- Published At (only show if published) -->
                                 <div v-if="form.status === 'published'">
-                                    <Label for="published_at">Publish Date</Label>
+                                    <Label for="published_at">{{ t('blog.posts.published_at') }}</Label>
                                     <Input
                                         id="published_at"
                                         v-model="form.published_at"
@@ -139,10 +142,10 @@ function submit() {
 
                                 <!-- Category -->
                                 <div>
-                                    <Label for="blog_category_id">Category *</Label>
+                                    <Label for="blog_category_id">{{ t('blog.posts.category') }} *</Label>
                                     <Select v-model="form.blog_category_id">
                                         <SelectTrigger class="mt-1">
-                                            <SelectValue placeholder="Select category" />
+                                            <SelectValue :placeholder="t('blog.posts.select_category')" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem v-for="category in props.categories" :key="category.id" :value="category.id.toString()">
@@ -154,7 +157,7 @@ function submit() {
                                 </div>
 
                                 <div>
-                                    <Label for="featured_image">Featured Image URL</Label>
+                                    <Label for="featured_image">{{ t('blog.posts.featured_image_url') }}</Label>
                                     <Input
                                         id="featured_image"
                                         v-model="form.featured_image"
@@ -169,11 +172,11 @@ function submit() {
                 </div>
 
                 <div>
-                    <Label for="content">Content *</Label>
+                    <Label for="content">{{ t('blog.posts.content') }} *</Label>
                     <div class="mt-1">
                         <TiptapEditor
                             v-model="form.content"
-                            placeholder="Write your post content here..."
+                            :placeholder="t('blog.posts.content_placeholder')"
                             :class="{ 'border-destructive': form.errors.content }"
                         />
                     </div>
@@ -183,12 +186,12 @@ function submit() {
                 <!-- Actions -->
                 <div class="flex justify-between">
                     <Button type="button" variant="outline" as-child>
-                        <Link :href="blog.posts.index().url">Cancel</Link>
+                        <Link :href="blog.posts.index().url">{{ t('common.cancel') }}</Link>
                     </Button>
                     <Button type="submit" :disabled="form.processing">
                         <Icon v-if="form.processing" name="loader-2" class="mr-2 h-4 w-4 animate-spin" />
                         <Icon v-else name="save" class="mr-2 h-4 w-4" />
-                        {{ form.processing ? 'Creating...' : 'Create' }}
+                        {{ form.processing ? t('common.creating') : t('common.create') }}
                     </Button>
                 </div>
             </form>

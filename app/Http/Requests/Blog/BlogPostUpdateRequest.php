@@ -4,6 +4,8 @@ namespace App\Http\Requests\Blog;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\BlogPost;
+use Illuminate\Validation\Rule;
+use App\Rules\UniqueJsonTranslation;
 
 class BlogPostUpdateRequest extends FormRequest
 {
@@ -17,10 +19,10 @@ class BlogPostUpdateRequest extends FormRequest
     public function rules(): array
     {
         $post = $this->route('post');
-        $id = $post?->id ?? 'NULL';
+        $id = $post?->id;
         return [
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', 'unique:blog_posts,slug,' . $id],
+            'slug' => ['nullable','string','max:255', new UniqueJsonTranslation(BlogPost::class, 'slug', null, $id)],
             'blog_category_id' => ['required', 'exists:blog_categories,id'],
             'excerpt' => ['nullable', 'string'],
             'content' => ['required', 'string'],

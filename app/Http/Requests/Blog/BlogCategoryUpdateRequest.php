@@ -4,6 +4,8 @@ namespace App\Http\Requests\Blog;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\BlogCategory;
+use Illuminate\Validation\Rule;
+use App\Rules\UniqueJsonTranslation;
 
 class BlogCategoryUpdateRequest extends FormRequest
 {
@@ -17,10 +19,10 @@ class BlogCategoryUpdateRequest extends FormRequest
     public function rules(): array
     {
         $category = $this->route('category');
-        $id = $category?->id ?? 'NULL';
+        $id = $category?->id;
         return [
             'name' => ['required','string','max:255'],
-            'slug' => ['nullable','string','max:255','unique:blog_categories,slug,' . $id],
+            'slug' => ['nullable','string','max:255', new UniqueJsonTranslation(BlogCategory::class, 'slug', null, $id)],
             'description' => ['nullable','string'],
             'color' => ['nullable','string','regex:/^#[0-9A-Fa-f]{6}$/'],
             'is_active' => ['boolean'],

@@ -101,8 +101,8 @@ class BlogPostController extends Controller
                 'status' => $post->status,
                 'published_at' => optional($post->published_at)->toDateTimeString(),
             ],
-            // и локализованные категории для селекта
-            'categories' => BlogCategoryResource::collection($categories),
+            // и локализованные категории для селекта (нужен простой массив)
+            'categories' => BlogCategoryResource::collection($categories)->toArray(request()),
         ]);
     }
 

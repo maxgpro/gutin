@@ -1,102 +1,118 @@
 {
-  "common": {
-    "save": "Сохранить",
-    "cancel": "Отмена",
-    "delete": "Удалить", 
-    "edit": "Редактировать",
-    "create": "Создать",
-    "back": "Назад",
-    "show": "Показать",
-    "loading": "Загрузка...",
-    "search": "Поиск",
-    "clear": "Очистить",
-    "submit": "Отправить",
-    "confirm": "Подтвердить",
-    "close": "Закрыть",
-    "yes": "Да",
-    "no": "Нет",
-    "today": "Сегодня",
-    "yesterday": "Вчера",
-    "days_ago": "{count, plural, one {# день назад} few {# дня назад} many {# дней назад} other {# дней назад}}"
-  },
-  "navigation": {
-    "dashboard": "Панель управления",
-    "blog": "Блог",
-    "categories": "Категории",
-    "posts": "Записи",
-    "settings": "Настройки",
-    "profile": "Профиль",
-    "logout": "Выйти"
-  },
-  "blog": {
-    "categories": {
-      "title": "Категории блога",
-      "create": "Создать категорию",
-      "edit": "Редактировать категорию",
-      "name": "Название",
-      "description": "Описание",
-      "color": "Цвет",
-      "active": "Активна",
-      "posts_count_label": "Количество записей",
-      "posts_count": "{count} запись | {count} записи | {count} записей",
-      "no_categories": "Категорий пока нет",
-      "created_successfully": "Категория успешно создана",
-      "updated_successfully": "Категория успешно обновлена",
-      "deleted_successfully": "Категория удалена",
-      "cannot_delete_with_posts": "Нельзя удалить категорию с существующими записями"
+    "common": {
+        "save": "Сохранить",
+        "cancel": "Отмена",
+        "delete": "Удалить",
+        "edit": "Редактировать",
+        "update": "Обновить",
+        "create": "Создать",
+        "back": "Назад",
+        "show": "Показать",
+        "loading": "Загрузка...",
+        "search": "Поиск",
+        "clear": "Очистить",
+        "submit": "Отправить",
+        "confirm": "Подтвердить",
+        "close": "Закрыть",
+        "yes": "Да",
+        "no": "Нет",
+        "today": "Сегодня",
+        "yesterday": "Вчера",
+        "days_ago": "{count, plural, one {# день назад} few {# дня назад} many {# дней назад} other {# дней назад}}",
+        "updating": "Обновление...",
+        "creating": "Создание..."
     },
-    "posts": {
-      "title": "Записи блога",
-      "create": "Создать запись",
-      "edit": "Редактировать запись",
-      "title_field": "Заголовок",
-      "content": "Содержание",
-      "excerpt": "Краткое описание",
-      "category": "Категория",
-      "status": "Статус",
-      "published_at": "Дата публикации",
-      "views": "Просмотры",
-      "reading_time": "мин. чтения",
-      "no_posts": "Записей пока нет",
-      "create_first": "Создать первую запись",
-      "created_successfully": "Запись успешно создана",
-      "updated_successfully": "Запись успешно обновлена",
-      "deleted_successfully": "Запись удалена",
-      "status_draft": "Черновик",
-      "status_published": "Опубликована",
-      "status_archived": "Архивирована"
+    "navigation": {
+        "dashboard": "Панель управления",
+        "blog": "Блог",
+        "categories": "Категории",
+        "posts": "Записи",
+        "settings": "Настройки",
+        "profile": "Профиль",
+        "logout": "Выйти"
     },
-    "filters": {
-      "all": "Все",
-      "status": "По статусу",
-      "category": "По категории",
-      "sort_by": "Сортировать по",
-      "sort_created_desc": "Новые сначала",
-      "sort_created_asc": "Старые сначала",
-      "sort_published_desc": "Недавно опубликованные",
-      "sort_published_asc": "Давно опубликованные"
+    "blog": {
+        "categories": {
+            "title": "Категории блога",
+            "create": "Создать категорию",
+            "edit": "Редактировать категорию",
+            "name": "Название",
+            "name_placeholder": "Введите название категории...",
+            "slug": "Слаг",
+            "auto_from_name": "Автоматически из названия",
+            "leave_empty_to_autogenerate_from_name": "Оставьте пустым для автогенерации из названия",
+            "description": "Описание",
+            "description_placeholder": "Краткое описание категории...",
+            "color": "Цвет",
+            "active": "Активна",
+            "update": "Обновить категорию",
+            "posts_count_label": "Количество записей",
+            "posts_count": "{count} запись | {count} записи | {count} записей",
+            "no_categories": "Категорий пока нет",
+            "created_successfully": "Категория успешно создана",
+            "updated_successfully": "Категория успешно обновлена",
+            "deleted_successfully": "Категория удалена",
+            "cannot_delete_with_posts": "Нельзя удалить категорию с существующими записями"
+        },
+        "posts": {
+            "title": "Записи блога",
+            "create": "Создать запись",
+            "edit": "Редактировать запись",
+            "title_field": "Заголовок",
+            "slug": "Слаг",
+            "leave_empty_to_autogenerate_from_title": "Оставьте пустым для автогенерации из заголовка",
+            "content": "Содержание",
+            "content_placeholder": "Напишите содержание вашей записи...",
+            "excerpt": "Краткое описание",
+            "excerpt_placeholder": "Краткое описание записи...",
+            "category": "Категория",
+            "select_category": "Выберите категорию",
+            "status": "Статус",
+            "published_at": "Дата публикации",
+            "publish_settings": "Настройки публикации",
+            "views": "Просмотры",
+            "featured_image_url": "URL изображения",
+            "reading_time": "мин. чтения",
+            "no_posts": "Записей пока нет",
+            "create_first": "Создать первую запись",
+            "created_successfully": "Запись успешно создана",
+            "updated_successfully": "Запись успешно обновлена",
+            "deleted_successfully": "Запись удалена",
+            "status_draft": "Черновик",
+            "status_published": "Опубликована",
+            "status_archived": "Архивирована"
+        },
+        "filters": {
+            "all": "Все",
+            "status": "По статусу",
+            "category": "По категории",
+            "sort_by": "Сортировать по",
+            "sort_created_desc": "Новые сначала",
+            "sort_created_asc": "Старые сначала",
+            "sort_published_desc": "Недавно опубликованные",
+            "sort_published_asc": "Давно опубликованные"
+        }
+    },
+    "forms": {
+        "validation": {
+            "required": "Это поле обязательно для заполнения",
+            "email": "Введите корректный email адрес",
+            "min": "Минимальная длина: {min} символов",
+            "max": "Максимальная длина: {max} символов"
+        }
+    },
+    "messages": {
+        "success": "Операция выполнена успешно",
+        "error": "Произошла ошибка",
+        "confirm_delete": "Вы уверены, что хотите удалить?",
+        "no_data": "Нет данных для отображения"
+    },
+    "language": {
+        "switch": "Сменить язык",
+        "current": "Текущий язык: Русский"
+    },
+    "pagination": {
+        "showing": "Показано с {from} по {to} из {total} результат | Показано с {from} по {to} из {total} результата | Показано с {from} по {to} из {total} результатов",
+        "entries": "записей | записи | записей"
     }
-  },
-  "forms": {
-    "validation": {
-      "required": "Это поле обязательно для заполнения",
-      "email": "Введите корректный email адрес",
-      "min": "Минимальная длина: {min} символов",
-      "max": "Максимальная длина: {max} символов"
-    }
-  },
-  "messages": {
-    "success": "Операция выполнена успешно",
-    "error": "Произошла ошибка",
-    "confirm_delete": "Вы уверены, что хотите удалить?",
-    "no_data": "Нет данных для отображения"
-  },
-  "language": {
-    "switch": "Сменить язык",
-    "current": "Текущий язык: Русский"
-  },
-  "pagination": {
-    "showing": "Показано с {from} по {to} из {total} результат | Показано с {from} по {to} из {total} результата | Показано с {from} по {to} из {total} результатов",
-    "entries": "записей | записи | записей"
-  }
 }

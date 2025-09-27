@@ -4,6 +4,8 @@ namespace App\Http\Requests\Blog;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\BlogPost;
+use Illuminate\Validation\Rule;
+use App\Rules\UniqueJsonTranslation;
 
 class BlogPostStoreRequest extends FormRequest
 {
@@ -16,7 +18,7 @@ class BlogPostStoreRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', 'unique:blog_posts,slug'],
+            'slug' => ['nullable','string','max:255', new UniqueJsonTranslation(BlogPost::class, 'slug')],
             'blog_category_id' => ['required', 'exists:blog_categories,id'],
             'excerpt' => ['nullable', 'string'],
             'content' => ['required', 'string'],

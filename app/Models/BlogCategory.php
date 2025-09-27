@@ -90,13 +90,8 @@ class BlogCategory extends Model
             $query->where('id', '!=', $this->id);
         }
         
-        // Use PostgreSQL JSON operators
-        if (config('database.default') === 'pgsql') {
-            return $query->whereRaw("slug->>? = ?", [$locale, $slug])->exists();
-        }
-        
-        // Fallback for SQLite
-        return $query->whereRaw("json_extract(slug, '$.{$locale}') = ?", [$slug])->exists();
+        // PostgreSQL JSONB operator to extract text value for the given locale
+        return $query->whereRaw("slug->>? = ?", [$locale, $slug])->exists();
     }
 
     /**
@@ -106,13 +101,8 @@ class BlogCategory extends Model
     {
         $locale = $locale ?: app()->getLocale();
         
-        // Use PostgreSQL JSON operators
-        if (config('database.default') === 'pgsql') {
-            return $query->orderByRaw("name->>? {$direction}", [$locale]);
-        }
-        
-        // Fallback for SQLite
-        return $query->orderByRaw("json_extract(name, '$.{$locale}') {$direction}");
+        // PostgreSQL JSONB operator to order by localized name
+        return $query->orderByRaw("name->>? {$direction}", [$locale]);
     }
 
     /**
@@ -122,13 +112,8 @@ class BlogCategory extends Model
     {
         $locale = $locale ?: app()->getLocale();
         
-        // Use PostgreSQL JSON operators
-        if (config('database.default') === 'pgsql') {
-            return static::whereRaw("slug->>? = ?", [$locale, $slug])->first();
-        }
-        
-        // Fallback for SQLite
-        return static::whereRaw("json_extract(slug, '$.{$locale}') = ?", [$slug])->first();
+        // PostgreSQL JSONB operator to match by localized slug
+        return static::whereRaw("slug->>? = ?", [$locale, $slug])->first();
     }
 
     public function posts(): HasMany
