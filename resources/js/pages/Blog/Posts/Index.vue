@@ -46,36 +46,17 @@ const form = ref<{
     sort_order: props.filters.sort_order || 'desc',
 });
 
-const debouncedSearch = useDebounceFn(() => {
+// Debounced single watcher to batch all filter changes (search/category/status/sort)
+const scheduleUpdate = useDebounceFn(() => {
     updateFilters();
-}, 300);
+}, 250);
 
 watch(
-    () => form.value.category,
+    form,
     () => {
-        updateFilters();
+        scheduleUpdate();
     },
-);
-
-watch(
-    () => form.value.status,
-    () => {
-        updateFilters();
-    },
-);
-
-watch(
-    () => form.value.sort_by,
-    () => {
-        updateFilters();
-    },
-);
-
-watch(
-    () => form.value.sort_order,
-    () => {
-        updateFilters();
-    },
+    { deep: true },
 );
 
 // Фильтры Категорий
@@ -138,6 +119,14 @@ function updateFilters() {
 
     const queryString = params.toString();
     const url = blog.posts.index().url + (queryString ? `?${queryString}` : '');
+
+    // Skip navigation if URL hasn't changed to avoid redundant requests
+    const target = new URL(url, window.location.origin);
+    const current = new URL(window.location.href);
+    if (target.pathname === current.pathname && target.search === current.search) {
+        return;
+    }
+
     router.get(url, {}, { preserveState: true, replace: true });
 }
 
@@ -154,12 +143,14 @@ const hasActiveFilters = computed(() => {
 
 // Очистка всех фильтров
 function clearFilters() {
-    form.value.search = '';
-    form.value.category = null;
-    form.value.status = null; // Можно безопасно очищать всегда
-    form.value.sort_by = 'published_at';
-    form.value.sort_order = 'desc';
-    updateFilters();
+    // Replace the whole form object to trigger a single debounced update
+    form.value = {
+        search: '',
+        category: null,
+        status: null,
+        sort_by: 'published_at',
+        sort_order: 'desc',
+    };
 }
 </script>
 
@@ -175,7 +166,7 @@ function clearFilters() {
                     <!-- Top row: Create button and Search -->
                     <div class="relative w-full">
                         <Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input v-model="form.search" placeholder="Search posts..." class="min-w-md pl-10" @input="debouncedSearch" />
+                        <Input v-model="form.search" placeholder="Search posts..." class="min-w-md pl-10" />
                     </div>
                     <Button v-if="canCreate" as-child>
                         <Link :href="blog.posts.create().url">

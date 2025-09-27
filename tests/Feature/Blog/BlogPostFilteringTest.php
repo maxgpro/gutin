@@ -44,6 +44,54 @@ test('posts can be filtered by status', function () {
     $response->assertOk();
 });
 
+test('posts can be filtered by category in current locale', function () {
+    // Use English locale for predictable slug assertions
+    app()->setLocale('en');
+
+    $categoryA = BlogCategory::factory()->create();
+    $categoryB = BlogCategory::factory()->create();
+
+    // Create one published post in each category
+    $postInA = BlogPost::factory()->create([
+        'status' => BlogPost::STATUS_PUBLISHED,
+        'published_at' => now(),
+        'blog_category_id' => $categoryA->id,
+        'title' => ['en' => 'Post A', 'ru' => 'Пост A', 'fr' => 'Article A'],
+    ]);
+
+    $postInB = BlogPost::factory()->create([
+        'status' => BlogPost::STATUS_PUBLISHED,
+        'published_at' => now(),
+        'blog_category_id' => $categoryB->id,
+        'title' => ['en' => 'Post B', 'ru' => 'Пост B', 'fr' => 'Article B'],
+    ]);
+
+    $slugA = $categoryA->getTranslation('slug', 'en');
+
+    $response = $this->get(route('blog.posts.index', ['category' => $slugA]));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) =>
+        $page
+            ->where('filters.category', $slugA)
+            ->has('posts.data', 1)
+            ->where('posts.data.0.category.slug', $slugA)
+    );
+});
+
+test('non-admin users cannot filter by non-published status', function () {
+    $user = User::factory()->create();
+
+    // As guest
+    $this->get(route('blog.posts.index', ['status' => BlogPost::STATUS_DRAFT]))
+        ->assertForbidden();
+
+    // As regular authenticated user
+    $this->actingAs($user)
+        ->get(route('blog.posts.index', ['status' => BlogPost::STATUS_DRAFT]))
+        ->assertForbidden();
+});
+
 test('posts can be sorted by published_at in descending order', function () {
     $olderPost = BlogPost::factory()->create([
         'status' => BlogPost::STATUS_PUBLISHED,

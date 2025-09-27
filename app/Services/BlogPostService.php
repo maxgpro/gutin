@@ -93,8 +93,11 @@ class BlogPostService
     protected function applyCategoryFilter(Builder $query, BlogPostIndexRequest $request): void
     {
         if ($request->has('category')) {
-            $query->whereHas('category', function ($q) use ($request) {
-                $q->where('slug', $request->category);
+            $slug = $request->category;
+            $locale = app()->getLocale();
+            $query->whereHas('category', function ($q) use ($slug, $locale) {
+                // Compare localized slug stored as JSONB
+                $q->whereRaw('slug->>? = ?', [$locale, $slug]);
             });
         }
     }
@@ -106,10 +109,12 @@ class BlogPostService
     {
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('content', 'like', "%{$search}%")
-                    ->orWhere('excerpt', 'like', "%{$search}%");
+            $locale = app()->getLocale();
+            $like = '%' . $search . '%';
+            $query->where(function ($q) use ($locale, $like) {
+                $q->whereRaw('title->>? ILIKE ?', [$locale, $like])
+                    ->orWhereRaw('content->>? ILIKE ?', [$locale, $like])
+                    ->orWhereRaw('excerpt->>? ILIKE ?', [$locale, $like]);
             });
         }
     }
