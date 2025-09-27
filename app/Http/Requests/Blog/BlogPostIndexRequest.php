@@ -29,7 +29,7 @@ class BlogPostIndexRequest extends FormRequest
     {
         return [
             'status' => ['nullable', 'string', 'in:' . implode(',', BlogPost::STATUSES)],
-            'category' => ['nullable', 'string'],
+            'category_id' => ['nullable', 'integer', 'exists:blog_categories,id'],
             'search' => ['nullable', 'string', 'max:255'],
             'sort_by' => ['nullable', 'string', 'in:published_at,created_at'],
             'sort_order' => ['nullable', 'string', 'in:asc,desc'],

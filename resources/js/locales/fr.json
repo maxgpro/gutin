@@ -80,7 +80,21 @@
             "deleted_successfully": "Article supprimé",
             "status_draft": "Brouillon",
             "status_published": "Publié",
-            "status_archived": "Archivé"
+            "status_archived": "Archivé",
+            "filters": {
+                "search_placeholder": "Rechercher des articles...",
+                "all_categories": "Toutes les catégories",
+                "all_statuses": "Tous les statuts",
+                "sort": {
+                    "published_date": "Date de publication",
+                    "created_date": "Date de création"
+                },
+                "sort_order": {
+                    "newest": "Plus récents",
+                    "oldest": "Plus anciens"
+                },
+                "clear": "Réinitialiser les filtres"
+            }
         },
         "filters": {
             "all": "Tous",

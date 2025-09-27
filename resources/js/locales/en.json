@@ -80,7 +80,21 @@
             "deleted_successfully": "Post deleted",
             "status_draft": "Draft",
             "status_published": "Published",
-            "status_archived": "Archived"
+            "status_archived": "Archived",
+            "filters": {
+                "search_placeholder": "Search posts...",
+                "all_categories": "All Categories",
+                "all_statuses": "All Statuses",
+                "sort": {
+                    "published_date": "Published Date",
+                    "created_date": "Created Date"
+                },
+                "sort_order": {
+                    "newest": "Newest",
+                    "oldest": "Oldest"
+                },
+                "clear": "Clear Filters"
+            }
         },
         "filters": {
             "all": "All",

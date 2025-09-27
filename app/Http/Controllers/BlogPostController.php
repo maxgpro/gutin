@@ -32,7 +32,13 @@ class BlogPostController extends Controller
             'posts' => $posts->through(fn ($post) => BlogPostResource::make($post)->toArray(request())),
             // Для фильтра по категориям достаточно локализованных значений
             'categories' => BlogCategoryResource::collection($categories)->toArray(request()),
-            'filters' => $request->only(['status', 'category', 'search', 'sort_by', 'sort_order']),
+            'filters' => [
+                'status' => $request->input('status'),
+                'category_id' => $request->filled('category_id') ? (int) $request->integer('category_id') : null,
+                'search' => $request->input('search'),
+                'sort_by' => $request->input('sort_by'),
+                'sort_order' => $request->input('sort_order'),
+            ],
             'statuses' => BlogPost::STATUSES,
             'canCreate' => $user ? Gate::allows('create', BlogPost::class) : false,
             'canFilterByStatus' => $user?->isAdmin() ?? false,

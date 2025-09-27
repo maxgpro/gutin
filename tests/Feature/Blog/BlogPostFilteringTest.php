@@ -44,38 +44,32 @@ test('posts can be filtered by status', function () {
     $response->assertOk();
 });
 
-test('posts can be filtered by category in current locale', function () {
-    // Use English locale for predictable slug assertions
-    app()->setLocale('en');
-
+test('posts can be filtered by category using category_id (locale-agnostic)', function () {
     $categoryA = BlogCategory::factory()->create();
     $categoryB = BlogCategory::factory()->create();
 
-    // Create one published post in each category
-    $postInA = BlogPost::factory()->create([
+    BlogPost::factory()->create([
         'status' => BlogPost::STATUS_PUBLISHED,
         'published_at' => now(),
         'blog_category_id' => $categoryA->id,
         'title' => ['en' => 'Post A', 'ru' => 'Пост A', 'fr' => 'Article A'],
     ]);
 
-    $postInB = BlogPost::factory()->create([
+    BlogPost::factory()->create([
         'status' => BlogPost::STATUS_PUBLISHED,
         'published_at' => now(),
         'blog_category_id' => $categoryB->id,
         'title' => ['en' => 'Post B', 'ru' => 'Пост B', 'fr' => 'Article B'],
     ]);
 
-    $slugA = $categoryA->getTranslation('slug', 'en');
-
-    $response = $this->get(route('blog.posts.index', ['category' => $slugA]));
+    $response = $this->get(route('blog.posts.index', ['category_id' => $categoryA->id]));
 
     $response->assertOk();
     $response->assertInertia(fn ($page) =>
         $page
-            ->where('filters.category', $slugA)
+            ->where('filters.category_id', $categoryA->id)
             ->has('posts.data', 1)
-            ->where('posts.data.0.category.slug', $slugA)
+            ->where('posts.data.0.category.id', $categoryA->id)
     );
 });
 

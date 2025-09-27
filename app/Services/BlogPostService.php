@@ -92,13 +92,8 @@ class BlogPostService
      */
     protected function applyCategoryFilter(Builder $query, BlogPostIndexRequest $request): void
     {
-        if ($request->has('category')) {
-            $slug = $request->category;
-            $locale = app()->getLocale();
-            $query->whereHas('category', function ($q) use ($slug, $locale) {
-                // Compare localized slug stored as JSONB
-                $q->whereRaw('slug->>? = ?', [$locale, $slug]);
-            });
+        if ($request->filled('category_id')) {
+            $query->where('blog_category_id', (int) $request->integer('category_id'));
         }
     }
 

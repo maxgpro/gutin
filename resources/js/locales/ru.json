@@ -80,7 +80,21 @@
             "deleted_successfully": "Запись удалена",
             "status_draft": "Черновик",
             "status_published": "Опубликована",
-            "status_archived": "Архивирована"
+            "status_archived": "Архивирована",
+            "filters": {
+                "search_placeholder": "Поиск записей...",
+                "all_categories": "Все категории",
+                "all_statuses": "Все статусы",
+                "sort": {
+                    "published_date": "Дата публикации",
+                    "created_date": "Дата создания"
+                },
+                "sort_order": {
+                    "newest": "Сначала новые",
+                    "oldest": "Сначала старые"
+                },
+                "clear": "Сбросить фильтры"
+            }
         },
         "filters": {
             "all": "Все",
