@@ -41,7 +41,7 @@ class BlogCategoryController extends Controller
         BlogCategory::create($request->validated());
 
         return redirect()->route('blog.categories.index')
-            ->with('success', 'Category created successfully.');
+            ->with('success', __('ui.category_created'));
     }
 
     public function show(BlogCategory $category)
@@ -85,7 +85,7 @@ class BlogCategoryController extends Controller
         $category->update($request->validated());
 
         return redirect()->route('blog.categories.index')
-            ->with('success', 'Category updated successfully.');
+            ->with('success', __('ui.category_updated'));
     }
 
     public function destroy(BlogCategory $category)
@@ -93,12 +93,12 @@ class BlogCategoryController extends Controller
         $this->authorize('delete', $category);
 
         if ($category->posts()->count() > 0) {
-            return back()->with('error', 'Cannot delete category with existing posts.');
+            return back()->with('error', __('ui.cannot_delete_with_posts'));
         }
 
         $category->delete();
 
         return redirect()->route('blog.categories.index')
-            ->with('success', 'Category deleted successfully.');
+            ->with('success', __('ui.category_deleted'));
     }
 }

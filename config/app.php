@@ -138,4 +138,19 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | UI Settings
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the default settings for the UI of your application.
+    |
+    */
+
+    'ui' => [
+        'theme' => env('APP_UI_THEME', 'system'), // Options: 'light', 'dark', 'system'
+        'posts_per_page' => (int) env('APP_UI_POSTS_PER_PAGE', 6),
+    ],
+
 ];

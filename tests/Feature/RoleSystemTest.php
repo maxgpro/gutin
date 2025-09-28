@@ -24,14 +24,4 @@ describe('Role System', function () {
         expect($user->hasRole(Role::MENTEE))->toBeTrue();
         expect($user->hasRole(Role::ADMIN))->toBeFalse();
     });
-
-    it('checks if user can access HH', function () {
-        $regularUser = User::factory()->create();
-        $adminUser = User::factory()->admin()->create();
-        $menteeUser = User::factory()->mentee()->create();
-        
-        expect($regularUser->canAccessHh())->toBeFalse();
-        expect($adminUser->canAccessHh())->toBeTrue();
-        expect($menteeUser->canAccessHh())->toBeTrue();
-    });
 });

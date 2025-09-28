@@ -68,13 +68,6 @@ DB_DATABASE=gutin_blog
 DB_USERNAME=gutin_user
 DB_PASSWORD=password
 
-# HeadHunter API (обязательно для продакшена)
-HH_CLIENT_ID=your_client_id
-HH_CLIENT_SECRET=your_client_secret
-HH_REDIRECT_URI=https://your-domain.com/hh/oauth/callback
-HH_APP_USER_AGENT="your-app/1.0 (your-email@example.com)"
-```
-
 ### 5. Инициализация базы данных
 
 ```bash
@@ -150,13 +143,6 @@ DB_DATABASE=gutin_blog
 DB_USERNAME=gutin_user
 DB_PASSWORD=your_secure_password
 
-# Обязательные настройки HH API
-HH_CLIENT_ID=your_production_client_id
-HH_CLIENT_SECRET=your_production_client_secret
-HH_REDIRECT_URI=https://your-domain.com/hh/oauth/callback
-HH_APP_USER_AGENT="YourApp/1.0 (contact@your-domain.com)"
-```
-
 ### 4. Миграции и данные
 
 ```bash
@@ -175,8 +161,7 @@ php artisan db:seed --class=BlogSeeder
 
 Приложение использует роли:
 
-- **ADMIN** - полный доступ к управлению блогом и HH API
-- **MENTEE** - доступ к HH API
+- **ADMIN** - полный доступ к управлению блогом
 - **USER** - базовый доступ
 
 ### Создание администратора
@@ -192,16 +177,6 @@ $adminRole = App\Models\Role::where('name', 'ADMIN')->first();
 $user->roles()->attach($adminRole);
 ```
 
-## API интеграции
-
-### HeadHunter API
-
-Для работы с HH API необходимо:
-
-1. Зарегистрировать приложение на https://dev.hh.ru/
-2. Получить CLIENT_ID и CLIENT_SECRET
-3. Настроить REDIRECT_URI в соответствии с вашим доменом
-
 ## Структура проекта
 
 ```
@@ -213,13 +188,10 @@ $user->roles()->attach($adminRole);
 app/
 ├── Http/Middleware/
 │   ├── AdminMiddleware.php      # Защита админских роутов
-│   └── HhAccessMiddleware.php   # Защита HH роутов
 ├── Models/
 │   ├── User.php                 # Пользователь с ролями
 │   ├── Role.php                 # Роли пользователей
-│   └── HhAccount.php           # Аккаунты HH с токенами
 ├── Services/
-│   └── HhApi.php               # Сервис для работы с HH API
 └── Policies/                   # Политики доступа
 
 resources/js/
@@ -230,7 +202,6 @@ resources/js/
 routes/
 ├── web.php                     # Основные маршруты
 ├── blog.php                    # Маршруты блога
-├── hh.php                      # Маршруты HH интеграции
 └── auth.php                    # Маршруты аутентификации
 
 tests/
@@ -312,7 +283,6 @@ php artisan test --testsuite=Feature
 # Тесты по категориям
 php artisan test --filter=Auth          # Аутентификация
 php artisan test --filter=Blog          # Блог система
-php artisan test --filter=Hh            # HeadHunter интеграция
 php artisan test --filter=Role          # Система ролей
 ```
 
@@ -328,7 +298,7 @@ php artisan test --filter=Role          # Система ролей
 ### Паттерны проектирования
 
 - **Repository Pattern** - через Eloquent модели
-- **Service Layer** - `BlogPostService`, `HhApi`
+- **Service Layer** - `BlogPostService`
 - **Policy Pattern** - авторизация через Laravel Policies
 - **Middleware Pattern** - защита маршрутов
 - **Observer Pattern** - автогенерация slug'ов
@@ -337,7 +307,6 @@ php artisan test --filter=Role          # Система ролей
 
 - **CSRF защита** на всех формах
 - **Rate limiting** для аутентификации
-- **Encrypted tokens** для HH API
 - **Role-based access** для всех админских функций
 - **SQL injection защита** через Eloquent ORM
 

@@ -146,7 +146,7 @@ watch(locale, (newLocale) => {
                             <Button type="submit" :disabled="form.processing">
                                 <Icon v-if="form.processing" name="loader-2" class="mr-2 h-4 w-4 animate-spin" />
                                 <Icon v-else name="save" class="mr-2 h-4 w-4" />
-                                {{ form.processing ? t('common.updating') : t('blog.common.update') }}
+                                {{ form.processing ? t('common.updating') : t('common.update') }}
                             </Button>
                         </div>
                     </form>

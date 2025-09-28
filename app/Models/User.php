@@ -45,10 +45,6 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    
-    public function hhAccounts() {
-        return $this->hasMany(\App\Models\HhAccount::class);
-    }
 
     public function blogPosts()
     {
@@ -83,10 +79,5 @@ class User extends Authenticatable
     public function isMentee(): bool
     {
         return $this->hasRole(Role::MENTEE);
-    }
-
-    public function canAccessHh(): bool
-    {
-        return $this->isMentee() || $this->isAdmin();
     }
 }

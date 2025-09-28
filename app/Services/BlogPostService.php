@@ -17,7 +17,7 @@ class BlogPostService
      */
     public function getFilteredPosts(BlogPostIndexRequest $request): LengthAwarePaginator
     {
-        $perPage = (int) $request->integer('per_page', 12);
+        $perPage = (int) $request->integer('per_page', config('ui.posts_per_page', 6));
         
         $query = BlogPost::with(['user', 'category']);
         

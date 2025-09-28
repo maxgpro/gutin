@@ -25,6 +25,6 @@ class LocaleController extends Controller
             return redirect()->back(status: 303);
         }
         
-        return redirect()->back()->with('success', "Language switched to {$locale}");
+    return redirect()->back()->with('success', __('ui.switch_language').': '.$locale);
     }
 }

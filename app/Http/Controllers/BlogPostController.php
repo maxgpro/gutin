@@ -65,7 +65,7 @@ class BlogPostController extends Controller
         $post = $this->blogPostService->createPost($validated);
 
         return redirect()->route('blog.posts.show', $post)
-            ->with('success', 'Post created successfully.');
+            ->with('success', __('ui.post_created'));
     }
 
     public function show(BlogPost $post)
@@ -119,7 +119,7 @@ class BlogPostController extends Controller
         $post = $this->blogPostService->updatePost($post, $validated);
 
         return redirect()->route('blog.posts.show', $post)
-            ->with('success', 'Post updated successfully.');
+            ->with('success', __('ui.post_updated'));
     }
 
     public function destroy(BlogPost $post)
@@ -129,6 +129,6 @@ class BlogPostController extends Controller
         $post->delete();
 
         return redirect()->route('blog.posts.index')
-            ->with('success', 'Post deleted successfully.');
+            ->with('success', __('ui.post_deleted'));
     }
 }

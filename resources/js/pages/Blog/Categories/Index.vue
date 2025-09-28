@@ -10,6 +10,8 @@ import { type BreadcrumbItem } from '@/types';
 import type { BlogCategoriesIndexProps, BlogCategory } from '@/types/blog';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
+import { Edit, Folder, Plus, Trash2 } from 'lucide-vue-next';
+
 
 // Composables
 const { t } = useI18n();
@@ -51,7 +53,7 @@ function deleteCategory(category: BlogCategory) {
                 <h1 class="text-3xl font-bold tracking-tight">{{ t('blog.categories.title') }}</h1>
                 <Button v-if="canCreate" as-child>
                     <Link :href="blog.categories.create().url">
-                        <Icon name="plus" class="h-4 w-4" />
+                        <Plus class="h-4 w-4" />
                         {{ t('blog.categories.create') }}
                     </Link>
                 </Button>
@@ -80,12 +82,12 @@ function deleteCategory(category: BlogCategory) {
                         <div v-if="$page.props.auth?.user" class="flex gap-2">
                             <Button variant="outline" size="sm" as-child>
                                 <Link :href="blog.categories.edit(category).url">
-                                    <Icon name="edit" class="mr-1 h-3 w-3" />
+                                    <Edit :size="16" />
                                     {{ t('common.edit') }}
                                 </Link>
                             </Button>
                             <Button @click="deleteCategory(category)" variant="outline" size="sm" :disabled="(category.posts_count || 0) > 0">
-                                <Icon name="trash-2" class="mr-1 h-3 w-3" />
+                                <Trash2 :size="16" />
                                 {{ t('common.delete') }}
                             </Button>
                         </div>
@@ -94,7 +96,7 @@ function deleteCategory(category: BlogCategory) {
             </div>
 
             <div v-else class="py-12 text-center">
-                <Icon name="folder" class="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                <Folder :size="60" class="mx-auto mb-4 text-muted-foreground" />
                 <p class="text-lg text-muted-foreground">{{ t('blog.categories.no_categories') }}</p>
                 <Button v-if="$page.props.auth?.user" as-child class="mt-4">
                     <Link :href="blog.categories.create().url">{{ t('blog.categories.create') }}</Link>

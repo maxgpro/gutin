@@ -2,21 +2,15 @@
 
 ## Architecture Overview
 
-This is a **Laravel 12 + Vue 3 + Inertia.js** full-stack application with **HeadHunter (hh.ru) API integration**. It uses:
+This is a **Laravel 12 + Vue 3 + Inertia.js** full-stack application. It uses:
 
-- **Backend**: Laravel 12 with encrypted token storage (`HhAccount` model)
+- **Backend**: Laravel 12 with encrypted token storage
 - **Frontend**: Vue 3 with TypeScript, Inertia.js for SPA behavior
 - **UI**: Reka UI components (Radix Vue) with Tailwind CSS v4
 - **Type-safe routing**: Laravel Wayfinder generates TypeScript route definitions
 - **Testing**: Pest PHP for backend tests
 
 ## Key Patterns & Conventions
-
-### OAuth Integration Pattern
-
-- `HhAccount` model stores encrypted API tokens with automatic refresh logic
-- `HhApi` service handles token lifecycle and API communication
-- Route pattern: `/hh/oauth/{redirect,callback,disconnect}` with custom middleware
 
 ### Frontend Architecture
 
@@ -49,10 +43,6 @@ php artisan test                 # Run Pest tests
 npm run lint                     # ESLint + Prettier check
 ```
 
-### Token Management
-
-The `HhApi::ensureFreshToken()` method automatically refreshes tokens 1 minute before expiry. Always use this service instead of direct API calls.
-
 ### Component Development
 
 - Use Reka UI components from `@/components/ui/`
@@ -67,7 +57,6 @@ The `HhApi::ensureFreshToken()` method automatically refreshes tokens 1 minute b
 
 ## Critical Files & Dependencies
 
-- `app/Services/HhApi.php` - Core API integration service
 - `resources/js/wayfinder/` - Auto-generated route definitions (don't edit)
 - `components.json` - Shadcn Vue configuration for UI components
 - `vite.config.ts` - Includes Wayfinder plugin for route generation

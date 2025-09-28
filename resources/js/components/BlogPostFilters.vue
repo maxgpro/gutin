@@ -100,14 +100,15 @@ function clearFilters() {
 
 <template>
     <div class="mb-6 space-y-4">
-        <div class="sm:flex-start flex flex-col gap-2 sm:flex-row sm:flex-wrap" :key="locale">
+        <div class="flex gap-2 flex-col sm:flex-row sm:flex-wrap sm:flex-start" :key="locale">
             <!-- External actions (e.g., Create button) -->
-            <slot name="actions" />
             <!-- Search -->
             <div class="relative w-full">
                 <Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input v-model="local.search" :placeholder="t('blog.posts.filters.search_placeholder')" class="min-w-md pl-10" />
             </div>
+
+            <slot name="actions" />
 
             <!-- Category Filter -->
             <Select v-model="categoryModel">
