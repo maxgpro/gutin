@@ -6,32 +6,11 @@ import blog from '@/routes/blog';
 import { Clock, Eye } from 'lucide-vue-next';
 import { useI18n } from 'vue-i18n';
 import { useLocalizedField } from '@/composables/useTranslation';
+import type { BlogPost } from '@/types/blog';
 
 // Composables
 const { t } = useI18n();
 const { getLocalized } = useLocalizedField();
-
-interface BlogPost {
-    id: number;
-    title: Record<string, string> | string;
-    slug: Record<string, string> | string;
-    excerpt: Record<string, string> | string | null;
-    featured_image: string | null;
-    status: string;
-    published_at: string | null;
-    views_count: number;
-    reading_time: number;
-    user: {
-        id: number;
-        name: string;
-    };
-    category: {
-        id: number;
-        name: Record<string, string> | string;
-        slug: Record<string, string> | string;
-        color: string;
-    };
-}
 
 interface Props {
     post: BlogPost;
