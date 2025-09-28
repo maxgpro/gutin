@@ -7,7 +7,7 @@ import { dashboard } from '@/routes';
 import blog from '@/routes/blog';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, FileText, Folder, LayoutGrid, LogIn, Tag } from 'lucide-vue-next';
+import { BookOpen, FileText, Folder, LayoutGrid, Tag } from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppLogo from './AppLogo.vue';
 
