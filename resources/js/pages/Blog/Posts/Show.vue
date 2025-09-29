@@ -113,7 +113,7 @@ function deletePost() {
             <!-- Related Posts -->
             <div v-if="relatedPosts.length > 0" class="border-t pt-8">
                 <h3 class="mb-6 text-2xl font-semibold">Related Posts</h3>
-                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div class="grid gap-6 md:grid-cols-2">
                     <BlogPostCard v-for="relatedPost in relatedPosts" :key="relatedPost.id" :post="relatedPost" />
                 </div>
             </div>

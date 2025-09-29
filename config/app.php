@@ -151,6 +151,7 @@ return [
     'ui' => [
         'theme' => env('APP_UI_THEME', 'system'), // Options: 'light', 'dark', 'system'
         'posts_per_page' => (int) env('APP_UI_POSTS_PER_PAGE', 6),
+        'related_posts_count' => (int) env('APP_UI_RELATED_POSTS_COUNT', 2),
     ],
 
 ];
