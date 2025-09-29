@@ -11,11 +11,12 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { Clock, Eye, SquarePen, Trash2 } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useLocalizedField } from '@/composables/useTranslation';
+import { useLocalizedField, useLocalizedDate } from '@/composables/useTranslation';
 
 // Composables  
 const { t } = useI18n();
 const { getLocalized } = useLocalizedField();
+const { formatDate } = useLocalizedDate();
 
 const props = defineProps<BlogPostsShowProps>();
 
@@ -41,17 +42,6 @@ const canEdit = computed(() => {
 const canDelete = computed(() => {
     return props.canDelete;
 });
-
-function formatDate(dateString: string | null): string {
-    if (!dateString) return '';
-
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    });
-}
 
 function deletePost() {
     const postTitle = getLocalized(props.post.title);
@@ -79,7 +69,7 @@ function deletePost() {
                 <div class="flex items-center justify-between border-b pb-6 text-sm text-muted-foreground">
                     <div class="flex items-center gap-4">
                         <span>By {{ post.user.name }}</span>
-                        <span>{{ formatDate(post.published_at) }}</span>
+                        <span>{{ formatDate(post.published_at ?? '') }}</span>
                         <span class="flex items-center gap-1">
                             <Clock class="h-4 w-4" />
                             {{ post.reading_time }} {{ t('blog.posts.reading_time') }}

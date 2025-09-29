@@ -5,29 +5,19 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import blog from '@/routes/blog';
 import { Clock, Eye } from 'lucide-vue-next';
 import { useI18n } from 'vue-i18n';
-import { useLocalizedField } from '@/composables/useTranslation';
+import { useLocalizedField, useLocalizedDate } from '@/composables/useTranslation';
 import type { BlogPost } from '@/types/blog';
 
 // Composables
 const { t } = useI18n();
 const { getLocalized } = useLocalizedField();
+const { formatDate } = useLocalizedDate();
 
 interface Props {
     post: BlogPost;
 }
 
 defineProps<Props>();
-
-function formatDate(dateString: string | null): string {
-    if (!dateString) return '';
-
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-    });
-}
 
 function getStatusVariant(status: string): "default" | "secondary" | "destructive" | "outline" {
     switch (status) {
@@ -51,6 +41,7 @@ function getStatusLabel(status: string): string {
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -58,6 +49,7 @@ function getStatusLabel(status: string): string {
 .line-clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -112,12 +104,12 @@ function getStatusLabel(status: string): string {
             <div class="flex items-center justify-between text-sm text-muted-foreground">
                 <div class="flex items-center gap-4">
                     <span>{{ post.user.name }}</span>
-                    <span>{{ formatDate(post.published_at) }}</span>
+                    <span>{{ formatDate((post.published_at ?? ''), { month: 'short' }) }}</span>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="flex items-center gap-1">
-                        <Clock class="h-3 w-3" />
-                        {{ post.reading_time }} {{ t('blog.posts.reading_time') }}
+                        <Clock class="h-3 w-3 ml-2" />
+                        {{ post.reading_time }} {{ t('blog.posts.minutes') }}
                     </span>
                     <span class="flex items-center gap-1">
                         <Eye class="h-3 w-3" />

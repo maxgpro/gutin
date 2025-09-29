@@ -78,6 +78,8 @@ class BlogPostController extends Controller
 
         // Increment views for published posts
         $this->blogPostService->incrementViews($post);
+        // Обновляем модель, чтобы вернуть актуальный счетчик просмотров
+        $post->refresh();
 
         // Get related posts
         $relatedPosts = $this->blogPostService->getRelatedPosts($post);

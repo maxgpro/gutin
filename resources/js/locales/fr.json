@@ -74,6 +74,7 @@
             "featured_image_url": "URL de l'image mise en avant",
             "views": "Vues",
             "reading_time": "min de lecture",
+            "minutes": "min",
             "no_posts": "Aucun article pour l'instant",
             "create_first": "Créer votre premier article",
             "created_successfully": "Article créé avec succès",

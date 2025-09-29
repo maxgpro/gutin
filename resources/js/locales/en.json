@@ -74,6 +74,7 @@
             "views": "Views",
             "featured_image_url": "Featured Image URL",
             "reading_time": "min read",
+            "minutes": "min",
             "no_posts": "No posts yet",
             "create_first": "Create Your First Post",
             "created_successfully": "Post created successfully",

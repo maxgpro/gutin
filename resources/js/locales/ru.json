@@ -74,6 +74,7 @@
             "views": "Просмотры",
             "featured_image_url": "URL изображения",
             "reading_time": "мин. чтения",
+            "minutes": "мин",
             "no_posts": "Записей пока нет",
             "create_first": "Создать первую запись",
             "created_successfully": "Запись успешно создана",
