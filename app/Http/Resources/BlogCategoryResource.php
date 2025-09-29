@@ -18,8 +18,9 @@ class BlogCategoryResource extends JsonResource
         
         return [
             'id' => $this->id,
-            'name' => $this->getTranslation('name', $locale),
+            'title' => $this->getTranslation('title', $locale),
             'slug' => $this->getTranslation('slug', $locale),
+            'base_slug' => $this->getLocalizedBaseSlug($locale),
             'description' => $this->getTranslation('description', $locale),
             'color' => $this->color,
             'is_active' => $this->is_active,

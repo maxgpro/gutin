@@ -35,7 +35,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
 ]);
 
 const form = useForm({
-    name: '',
+    title: '',
     slug: '',
     description: '',
     color: '#3b82f6',
@@ -61,18 +61,18 @@ function submit() {
                 </CardHeader>
                 <CardContent>
                     <form @submit.prevent="submit" class="space-y-6">
-                        <!-- Name -->
+                        <!-- Title -->
                         <div>
-                            <Label for="name">{{ t('blog.categories.name') }} *</Label>
+                            <Label for="title">{{ t('blog.categories.field_title') }} *</Label>
                             <Input
-                                id="name"
-                                v-model="form.name"
+                                id="title"
+                                v-model="form.title"
                                 type="text"
-                                :placeholder="t('blog.categories.name_placeholder')"
-                                :class="['mt-1', { 'border-destructive': form.errors.name }]"
+                                :placeholder="t('blog.categories.title_placeholder')"
+                                :class="['mt-1', { 'border-destructive': form.errors.title }]"
                                 required
                             />
-                            <InputError :message="form.errors.name" />
+                            <InputError :message="form.errors.title" />
                         </div>
 
                         <!-- Slug -->

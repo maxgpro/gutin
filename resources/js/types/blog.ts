@@ -4,8 +4,9 @@ export interface BlogPost {
     id: number;
     title: Record<string, string> | string;
     slug: Record<string, string> | string;
-    excerpt: Record<string, string> | string | null;
-    content?: Record<string, string> | string; // Доступно только на странице просмотра
+    base_slug: Record<string, string> | string;
+    excerpt: Record<string, string> | string;
+    content: Record<string, string> | string;
     featured_image: string | null;
     status: string;
     published_at: string | null;
@@ -19,7 +20,7 @@ export interface BlogPost {
     };
     category: {
         id: number;
-        name: Record<string, string> | string;
+        title: Record<string, string> | string;
         slug: Record<string, string> | string;
         color: string;
     };
@@ -27,8 +28,9 @@ export interface BlogPost {
 
 export interface BlogCategory {
     id: number;
-    name: Record<string, string> | string;
+    title: Record<string, string> | string;
     slug: Record<string, string> | string;
+    base_slug: Record<string, string> | string;
     color: string;
     description?: Record<string, string> | string | null;
     is_active?: boolean;

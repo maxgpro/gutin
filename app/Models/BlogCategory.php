@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,12 +11,12 @@ use Spatie\Translatable\HasTranslations;
 
 class BlogCategory extends Model
 {
-    use HasFactory, HasTranslations;
+    use HasFactory, HasTranslations, HasSlug;
 
-    public $translatable = ['name', 'slug', 'description'];
+    public $translatable = ['title', 'slug', 'description'];
 
     protected $fillable = [
-        'name',
+        'title',
         'slug',
         'description',
         'color',
@@ -23,97 +24,20 @@ class BlogCategory extends Model
     ];
 
     protected $casts = [
-        'name' => 'array',
+        'title' => 'array',
         'slug' => 'array',
         'description' => 'array',
         'is_active' => 'boolean',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($category) {
-            $category->generateSlugsForAllLocales();
-        });
-
-        static::updating(function ($category) {
-            if ($category->isDirty('name')) {
-                $category->generateSlugsForAllLocales();
-            }
-        });
-    }
-
     /**
-     * Generate slugs for all available locales
+     * Scope for ordering by localized title
      */
-    public function generateSlugsForAllLocales(): void
-    {
-        $availableLocales = array_keys(config('app.available_locales'));
-        $slugs = [];
-
-        foreach ($availableLocales as $locale) {
-            $name = $this->getTranslation('name', $locale);
-            if ($name) {
-                $slugs[$locale] = $this->generateUniqueSlug($name, $locale);
-            }
-        }
-
-        $this->slug = $slugs;
-    }
-
-    /**
-     * Generate unique slug for specific locale
-     */
-    private function generateUniqueSlug(string $name, string $locale): string
-    {
-        $baseSlug = Str::slug($name);
-        $slug = $baseSlug;
-        $counter = 1;
-
-        while ($this->slugExistsInLocale($slug, $locale)) {
-            $slug = $baseSlug . '-' . $counter;
-            $counter++;
-        }
-
-        return $slug;
-    }
-
-    /**
-     * Check if slug exists in specific locale
-     */
-    private function slugExistsInLocale(string $slug, string $locale): bool
-    {
-        $query = static::query();
-        
-        if ($this->exists) {
-            $query->where('id', '!=', $this->id);
-        }
-        
-        // PostgreSQL JSONB operator to extract text value for the given locale
-        return $query->whereRaw("slug->>? = ?", [$locale, $slug])->exists();
-    }
-
-    /**
-     * Scope for ordering by localized name
-     */
-    public function scopeOrderByLocalizedName($query, ?string $locale = null, string $direction = 'asc')
+    public function scopeOrderByLocalizedTitle($query, ?string $locale = null, string $direction = 'asc')
     {
         $locale = $locale ?: app()->getLocale();
-        
-        // PostgreSQL JSONB operator to order by localized name
-        return $query->orderByRaw("name->>? {$direction}", [$locale]);
-    }
-
-    /**
-     * Find category by slug in current locale
-     */
-    public static function findBySlug(string $slug, ?string $locale = null): ?self
-    {
-        $locale = $locale ?: app()->getLocale();
-        
-        // PostgreSQL JSONB operator to match by localized slug
-        return static::whereRaw("slug->>? = ?", [$locale, $slug])->first();
+        // PostgreSQL JSONB operator to order by localized title
+        return $query->orderByRaw("title->>? {$direction}", [$locale]);
     }
 
     public function posts(): HasMany
@@ -124,24 +48,5 @@ class BlogCategory extends Model
     public function publishedPosts(): HasMany
     {
         return $this->posts()->where('status', BlogPost::STATUS_PUBLISHED)->whereNotNull('published_at');
-    }
-
-    public function getRouteKeyName(): string
-    {
-        return 'id';
-    }
-
-    /**
-     * Resolve route model binding for slug
-     */
-    public function resolveRouteBinding($value, $field = null)
-    {
-        // If it's numeric, treat as ID
-        if (is_numeric($value)) {
-            return $this->where('id', $value)->first();
-        }
-
-        // Otherwise treat as slug and search in current locale
-        return $this->findBySlug($value);
     }
 }

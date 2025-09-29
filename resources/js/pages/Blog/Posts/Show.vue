@@ -29,7 +29,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: blog.posts.index().url,
     },
     {
-        title: getLocalized(props.post.category.name),
+        title: getLocalized(props.post.category.title),
         href: blog.categories.show(props.post.category).url,
     },
 ];
@@ -70,7 +70,7 @@ function deletePost() {
             <header class="mb-8">
                 <div class="mb-4">
                     <Badge variant="secondary" :style="{ backgroundColor: post.category.color + '20', color: post.category.color }">
-                        {{ getLocalized(post.category.name) }}
+                        {{ getLocalized(post.category.title) }}
                     </Badge>
                 </div>
 

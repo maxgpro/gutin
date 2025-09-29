@@ -54,7 +54,7 @@ test('regular user cannot create category', function () {
 
 test('admin can create category', function () {
     $categoryData = [
-        'name' => 'Test Category',
+        'title' => 'Test Category',
         'color' => '#ff0000',
         'is_active' => true
     ];
@@ -68,8 +68,8 @@ test('admin can create category', function () {
         ->first();
     
     expect($category)->not->toBeNull();
-    expect($category->name)->toBe('Test Category');
-    expect($category->slug)->toBe('test-category');
+    expect($category->title)->toBe('Test Category');
+    expect($category->slug)->toBe($category->id . '-test-category');
 });
 
 test('regular user cannot access edit category page', function () {
@@ -95,7 +95,7 @@ test('regular user cannot update category', function () {
 
 test('admin can update category', function () {
     $categoryData = [
-        'name' => 'Updated Category',
+        'title' => 'Updated Category',
         'color' => '#00ff00',
         'is_active' => false
     ];
@@ -107,8 +107,8 @@ test('admin can update category', function () {
     $updatedCategory = BlogCategory::find($this->category->id);
     
     expect($updatedCategory)->not->toBeNull();
-    expect($updatedCategory->name)->toBe('Updated Category');
-    expect($updatedCategory->slug)->toBe('updated-category');
+    expect($updatedCategory->title)->toBe('Updated Category');
+    expect($updatedCategory->slug)->toBe($updatedCategory->id . '-updated-category');
     expect($updatedCategory->color)->toBe('#00ff00');
     expect($updatedCategory->is_active)->toBe(false);
 });

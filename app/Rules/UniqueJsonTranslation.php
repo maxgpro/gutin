@@ -16,6 +16,7 @@ class UniqueJsonTranslation implements ValidationRule
         protected string $column,
         protected ?string $locale = null,
         protected int|string|null $ignoreId = null,
+        protected bool $isBaseSlug = false,
         protected string $idColumn = 'id',
     ) {
         $this->locale = $this->locale ?: app()->getLocale();
@@ -33,8 +34,14 @@ class UniqueJsonTranslation implements ValidationRule
             $query->where($this->idColumn, '!=', $this->ignoreId);
         }
 
-        // PostgreSQL JSONB operator to extract text value for the given locale
-        $query->whereRaw("{$this->column}->>? = ?", [$this->locale, $value]);
+        if ($this->isBaseSlug) {
+            // For base slugs, we need to check if any other model has this base slug
+            // by comparing the part after the ID prefix
+            $query->whereRaw("SUBSTRING({$this->column}->>? FROM '[0-9]+-(.*)') = ?", [$this->locale, $value]);
+        } else {
+            // PostgreSQL JSONB operator to extract text value for the given locale
+            $query->whereRaw("{$this->column}->>? = ?", [$this->locale, $value]);
+        }
 
         if ($query->exists()) {
             $fail(trans('validation.unique', ['attribute' => $attribute]));

@@ -37,7 +37,7 @@ function deleteCategory(category: BlogCategory) {
         return;
     }
 
-    const categoryName = getLocalized(category.name);
+    const categoryName = getLocalized(category.title);
     if (confirm(t('messages.confirm_delete') + ` "${categoryName}"?`)) {
         router.delete(blog.categories.destroy(category).url);
     }
@@ -71,7 +71,7 @@ function deleteCategory(category: BlogCategory) {
 
                         <h3 class="mb-2 text-xl font-semibold">
                             <!-- <TextLink :href="blog.categories.show(category)" class="hover:text-primary"> -->
-                            {{ getLocalized(category.name) }}
+                            {{ getLocalized(category.title) }}
                             <!-- </TextLink> -->
                         </h3>
 

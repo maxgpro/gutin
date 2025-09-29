@@ -15,11 +15,11 @@ return new class extends Migration
         Schema::table('blog_categories', function (Blueprint $table) {
             // Drop existing non-JSON columns and constraints
             $table->dropUnique(['slug']);
-            $table->dropColumn(['name', 'slug', 'description']);
+            $table->dropColumn(['title', 'slug', 'description']);
             
             // Add JSON columns for translations
-            $table->jsonb('name')->after('id');
-            $table->jsonb('slug')->after('name');
+            $table->jsonb('title')->after('id');
+            $table->jsonb('slug')->after('title');
             $table->jsonb('description')->nullable()->after('slug');
         });
         
@@ -64,7 +64,7 @@ return new class extends Migration
 
         Schema::table('blog_categories', function (Blueprint $table) {
             // Drop JSON columns
-            $table->dropColumn(['name', 'slug', 'description']);
+            $table->dropColumn(['title', 'slug', 'description']);
             
             // Restore original string columns
             $table->string('name')->after('id');

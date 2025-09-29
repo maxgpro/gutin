@@ -20,7 +20,7 @@ class BlogCategoryController extends Controller
         $this->authorize('viewAny', BlogCategory::class);
 
         $categories = BlogCategory::withCount('posts')
-            ->orderByLocalizedName()
+            ->orderByLocalizedTitle()
             ->get();
 
         return Inertia::render('Blog/Categories/Index', [
@@ -38,7 +38,28 @@ class BlogCategoryController extends Controller
 
     public function store(BlogCategoryStoreRequest $request)
     {
-        BlogCategory::create($request->validated());
+        $data = $request->validated();
+
+        // Extract base slug if provided (may be empty)
+        $hasSlugKey = array_key_exists('slug', $data);
+        $baseSlug = $hasSlugKey ? (string) $data['slug'] : null;
+        unset($data['slug']); // Remove from data as trait will handle slug generation
+        
+        $category = BlogCategory::create($data);
+
+        // Set base slug after creation
+        if ($hasSlugKey) {
+            if (is_string($baseSlug) && trim($baseSlug) !== '') {
+                $category->setLocalizedBaseSlug(trim($baseSlug));
+                $category->save();
+            } else {
+                $title = $category->getTranslation('title', app()->getLocale());
+                if ($title) {
+                    $category->setLocalizedBaseSlug(\Illuminate\Support\Str::slug($title));
+                    $category->save();
+                }
+            }
+        }
 
         return redirect()->route('blog.categories.index')
             ->with('success', __('ui.category_created'));
@@ -65,14 +86,12 @@ class BlogCategoryController extends Controller
 
     public function edit(BlogCategory $category)
     {
-        // Админский middleware уже проверил права
         return Inertia::render('Blog/Categories/Edit', [
-            // Для формы редактирования удобнее отдать все переводы
-            // чтобы сохранить возможность локализованного ввода на фронте при необходимости
             'category' => [
                 'id' => $category->id,
-                'name' => $category->getTranslations('name'),
+                'title' => $category->getTranslations('title'),
                 'slug' => $category->getTranslations('slug'),
+                'base_slug' => $this->getBaseSlugs($category),
                 'description' => $category->getTranslations('description'),
                 'color' => $category->color,
                 'is_active' => $category->is_active,
@@ -82,7 +101,27 @@ class BlogCategoryController extends Controller
 
     public function update(BlogCategoryUpdateRequest $request, BlogCategory $category)
     {
-        $category->update($request->validated());
+        $data = $request->validated();
+
+        // Extract base slug if provided (may be empty)
+        $hasSlugKey = array_key_exists('slug', $data);
+        $baseSlug = $hasSlugKey ? (string) $data['slug'] : null;
+        unset($data['slug']);
+
+        $category->update($data);
+
+        if ($hasSlugKey) {
+            if (trim($baseSlug) !== '') {
+                $category->setLocalizedBaseSlug(trim($baseSlug));
+                $category->save();
+            } else {
+                $title = $category->getTranslation('title', app()->getLocale());
+                if ($title) {
+                    $category->setLocalizedBaseSlug(\Illuminate\Support\Str::slug($title));
+                    $category->save();
+                }
+            }
+        }
 
         return redirect()->route('blog.categories.index')
             ->with('success', __('ui.category_updated'));
@@ -100,5 +139,20 @@ class BlogCategoryController extends Controller
 
         return redirect()->route('blog.categories.index')
             ->with('success', __('ui.category_deleted'));
+    }
+
+    /**
+     * Get base slugs for all locales
+     */
+    private function getBaseSlugs($model): array
+    {
+        $baseSlugs = [];
+        $availableLocales = array_keys(config('app.available_locales'));
+        
+        foreach ($availableLocales as $locale) {
+            $baseSlugs[$locale] = $model->getLocalizedBaseSlug($locale) ?? '';
+        }
+        
+        return $baseSlugs;
     }
 }

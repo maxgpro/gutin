@@ -22,7 +22,7 @@ class BlogPostUpdateRequest extends FormRequest
         $id = $post?->id;
         return [
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable','string','max:255', new UniqueJsonTranslation(BlogPost::class, 'slug', null, $id)],
+            'slug' => ['nullable','string','max:255', new UniqueJsonTranslation(BlogPost::class, 'slug', null, $id, true)],
             'blog_category_id' => ['required', 'exists:blog_categories,id'],
             'excerpt' => ['nullable', 'string'],
             'content' => ['required', 'string'],

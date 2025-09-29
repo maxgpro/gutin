@@ -16,8 +16,10 @@ import { type BlogPostsCreateProps } from '@/types/blog';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useLocalizedField } from '@/composables/useTranslation';
 
 const { t } = useI18n();
+const { getLocalized } = useLocalizedField();
 const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     {
         title: t('navigation.dashboard'),
@@ -149,7 +151,7 @@ function submit() {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem v-for="category in props.categories" :key="category.id" :value="category.id.toString()">
-                                                {{ category.name }}
+                                                {{ getLocalized(category.title) }}
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>

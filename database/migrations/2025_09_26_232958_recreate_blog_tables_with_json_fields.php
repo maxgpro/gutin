@@ -21,7 +21,7 @@ return new class extends Migration
         // Recreate blog_categories with JSON fields
         Schema::create('blog_categories', function (Blueprint $table) {
             $table->id();
-            $table->json('name');
+            $table->json('title');
             $table->json('slug');
             $table->json('description')->nullable();
             $table->string('color', 7)->default('#3B82F6');

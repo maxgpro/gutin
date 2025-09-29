@@ -135,8 +135,31 @@ class BlogPostService
         if ($data['status'] === BlogPost::STATUS_PUBLISHED && empty($data['published_at'])) {
             $data['published_at'] = now();
         }
+
+        // Extract base slug if provided
+        $hasSlugKey = array_key_exists('slug', $data);
+        $baseSlug = $hasSlugKey ? (string) $data['slug'] : null;
+        unset($data['slug']); // Remove from data as trait will handle slug generation
         
-        return BlogPost::create($data);
+        $post = BlogPost::create($data);
+
+        // Set base slug after creation
+        if ($hasSlugKey) {
+            if (is_string($baseSlug) && trim($baseSlug) !== '') {
+                // Provided non-empty base slug
+                $post->setLocalizedBaseSlug(trim($baseSlug));
+                $post->save();
+            } else {
+                // Empty -> generate from title for current locale
+                $title = $post->getTranslation('title', app()->getLocale());
+                if ($title) {
+                    $post->setLocalizedBaseSlug(\Illuminate\Support\Str::slug($title));
+                    $post->save();
+                }
+            }
+        }
+        
+        return $post;
     }
 
     /**
@@ -147,8 +170,31 @@ class BlogPostService
         if ($data['status'] === BlogPost::STATUS_PUBLISHED && empty($data['published_at'])) {
             $data['published_at'] = now();
         }
-        
+
+        // Extract base slug if provided (may be empty string)
+        $hasSlugKey = array_key_exists('slug', $data);
+        $baseSlug = $hasSlugKey ? (string) $data['slug'] : null;
+        unset($data['slug']);
+
+        // Update other fields first (may regenerate slug from title via trait hooks)
         $post->update($data);
+
+        // If slug key was provided
+        if ($hasSlugKey) {
+            // If non-empty -> set explicitly
+            if (trim($baseSlug) !== '') {
+                $post->setLocalizedBaseSlug(trim($baseSlug));
+                $post->save();
+            } else {
+                // Empty base slug -> regenerate from title for current locale
+                // Take current locale title and set base slug using Str::slug
+                $title = $post->getTranslation('title', app()->getLocale());
+                if ($title) {
+                    $post->setLocalizedBaseSlug(\Illuminate\Support\Str::slug($title));
+                    $post->save();
+                }
+            }
+        }
         
         return $post->fresh();
     }

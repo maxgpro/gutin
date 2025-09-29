@@ -48,7 +48,7 @@
                             <div class="flex items-center">
                                 <div class="mr-3 h-4 w-4 rounded-full bg-blue-500"></div>
                                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                                    {{ getLocalized(sampleCategory.name) }}
+                                    {{ getLocalized(sampleCategory.title) }}
                                 </h3>
                             </div>
                             <span class="text-sm text-gray-500">
@@ -112,7 +112,7 @@ const { formatDate, formatDateTime } = useLocalizedDate();
 
 // Sample data
 const sampleCategory = {
-    name: { ru: 'Веб-разработка', en: 'Web Development', fr: 'Développement Web' },
+    title: { ru: 'Веб-разработка', en: 'Web Development', fr: 'Développement Web' },
     description: {
         ru: 'Всё о современной веб-разработке и технологиях',
         en: 'Everything about modern web development and technologies',

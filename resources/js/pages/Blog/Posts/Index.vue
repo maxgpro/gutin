@@ -45,11 +45,11 @@ const form = ref<{
     sort_order: props.filters.sort_order || 'desc',
 });
 
-// Normalize categories for filter component (ensure name uses current locale)
+// Normalize categories for filter component (ensure title uses current locale)
 const categoriesForFilters = computed(() =>
     props.categories.map((c) => ({
         id: c.id,
-        name: typeof c.name === 'string' ? c.name : (c.name as Record<string, string>)[locale.value] ?? '',
+        name: typeof c.title === 'string' ? c.title : (c.title as Record<string, string>)[locale.value] ?? '',
     })),
 );
 

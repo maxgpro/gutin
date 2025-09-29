@@ -21,8 +21,8 @@ class BlogCategoryUpdateRequest extends FormRequest
         $category = $this->route('category');
         $id = $category?->id;
         return [
-            'name' => ['required','string','max:255'],
-            'slug' => ['nullable','string','max:255', new UniqueJsonTranslation(BlogCategory::class, 'slug', null, $id)],
+            'title' => ['required','string','max:255'],
+            'slug' => ['nullable','string','max:255', new UniqueJsonTranslation(BlogCategory::class, 'slug', null, $id, true)],
             'description' => ['nullable','string'],
             'color' => ['nullable','string','regex:/^#[0-9A-Fa-f]{6}$/'],
             'is_active' => ['boolean'],

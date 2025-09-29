@@ -40,7 +40,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
 
 const form = useForm({
     title: getLocalized(props.post.title, undefined, ''),
-    slug: getLocalized(props.post.slug, undefined, ''),
+    slug: getLocalized(props.post.base_slug, undefined, ''),
     excerpt: getLocalized(props.post.excerpt, undefined, ''),
     content: getLocalized(props.post.content, undefined, ''),
     blog_category_id: props.post.blog_category_id?.toString() || '',
@@ -56,7 +56,7 @@ function submit() {
 // When locale changes, rehydrate form fields with that locale values
 watch(locale, (newLocale) => {
     form.title = getLocalized(props.post.title, newLocale, '');
-    form.slug = getLocalized(props.post.slug, newLocale, '');
+    form.slug = getLocalized(props.post.base_slug, newLocale, '');
     form.excerpt = getLocalized(props.post.excerpt, newLocale, '');
     form.content = getLocalized(props.post.content, newLocale, '');
 });
@@ -141,7 +141,7 @@ watch(locale, (newLocale) => {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem v-for="category in categories" :key="category.id" :value="String(category.id)">
-                                                {{ category.name }}
+                                                {{ getLocalized(category.title) }}
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>

@@ -19,7 +19,7 @@ import { useI18n } from 'vue-i18n';
 
 const props = defineProps<BlogCategoriesEditProps>();
 const { getLocalized } = useLocalizedField();
-const localizedName = computed(() => getLocalized(props.category.name, undefined, ''));
+const localizedName = computed(() => getLocalized(props.category.title, undefined, ''));
 const { t, locale } = useI18n();
 
 const breadcrumbs = computed<BreadcrumbItem[]>(() => [
@@ -38,8 +38,8 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
 ]);
 
 const form = useForm({
-    name: getLocalized(props.category.name, undefined, ''),
-    slug: getLocalized(props.category.slug, undefined, ''),
+    title: getLocalized(props.category.title, undefined, ''),
+    slug: getLocalized(props.category.base_slug, undefined, ''),
     description: getLocalized(props.category.description, undefined, ''),
     color: props.category.color || '#3b82f6',
     is_active: props.category.is_active ?? true,
@@ -51,8 +51,8 @@ function submit() {
 
 // When app locale changes, rehydrate form fields with that locale values
 watch(locale, (newLocale) => {
-    form.name = getLocalized(props.category.name, newLocale, '');
-    form.slug = getLocalized(props.category.slug, newLocale, '');
+    form.title = getLocalized(props.category.title, newLocale, '');
+    form.slug = getLocalized(props.category.base_slug, newLocale, '');
     form.description = getLocalized(props.category.description, newLocale, '');
 });
 </script>
@@ -71,18 +71,18 @@ watch(locale, (newLocale) => {
                 </CardHeader>
                 <CardContent>
                     <form @submit.prevent="submit" class="space-y-6">
-                        <!-- Name -->
+                        <!-- Title -->
                         <div>
-                            <Label for="name">{{ t('blog.categories.name') }} *</Label>
+                            <Label for="title">{{ t('blog.categories.field_title') }} *</Label>
                             <Input
-                                id="name"
-                                v-model="form.name"
+                                id="title"
+                                v-model="form.title"
                                 type="text"
-                                :placeholder="t('blog.categories.name_placeholder')"
-                                :class="['mt-1', { 'border-destructive': form.errors.name }]"
+                                :placeholder="t('blog.categories.title_placeholder')"
+                                :class="['mt-1', { 'border-destructive': form.errors.title }]"
                                 required
                             />
-                            <InputError :message="form.errors.name" />
+                            <InputError :message="form.errors.title" />
                         </div>
 
                         <!-- Slug -->

@@ -1,5 +1,8 @@
 # AI Agent Instructions for Laravel 12 + Vue + Inertia.js Project
 
+## Humanize
+User speak Russian. Respond in Russian.
+
 ## Architecture Overview
 
 This is a **Laravel 12 + Vue 3 + Inertia.js** full-stack application. It uses:

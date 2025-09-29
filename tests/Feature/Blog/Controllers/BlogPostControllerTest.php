@@ -56,7 +56,7 @@ test('admin can create post', function () {
     
     expect($post)->not->toBeNull();
     expect($post->title)->toBe('Test Post');
-    expect($post->slug)->toBe('test-post');
+    expect($post->getLocalizedSlug())->toBe($post->id . '-test-post');
 });
 
 test('author can delete their own post', function () {

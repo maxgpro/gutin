@@ -20,6 +20,7 @@ class BlogPostResource extends JsonResource
             'id' => $this->id,
             'title' => $this->getTranslation('title', $locale),
             'slug' => $this->getTranslation('slug', $locale),
+            'base_slug' => $this->getLocalizedBaseSlug($locale),
             'excerpt' => $this->getTranslation('excerpt', $locale),
             'content' => $this->getTranslation('content', $locale),
             'featured_image' => $this->featured_image,
@@ -38,7 +39,7 @@ class BlogPostResource extends JsonResource
             'category' => $this->when($this->relationLoaded('category') || isset($this->category), function () use ($locale) {
                 return [
                     'id' => $this->category->id,
-                    'name' => $this->category->getTranslation('name', $locale),
+                    'title' => $this->category->getTranslation('title', $locale),
                     'slug' => $this->category->getTranslation('slug', $locale),
                     'color' => $this->category->color,
                 ];

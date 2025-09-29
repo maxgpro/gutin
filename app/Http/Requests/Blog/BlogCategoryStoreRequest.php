@@ -17,8 +17,8 @@ class BlogCategoryStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required','string','max:255'],
-            'slug' => ['nullable','string','max:255', new UniqueJsonTranslation(BlogCategory::class, 'slug')],
+            'title' => ['required','string','max:255'],
+            'slug' => ['nullable','string','max:255', new UniqueJsonTranslation(BlogCategory::class, 'slug', null, null, true)],
             'description' => ['nullable','string'],
             'color' => ['nullable','string','regex:/^#[0-9A-Fa-f]{6}$/'],
             'is_active' => ['boolean'],

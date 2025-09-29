@@ -100,6 +100,7 @@ class BlogPostController extends Controller
                 'id' => $post->id,
                 'title' => $post->getTranslations('title'),
                 'slug' => $post->getTranslations('slug'),
+                'base_slug' => $this->getBaseSlugs($post),
                 'excerpt' => $post->getTranslations('excerpt'),
                 'content' => $post->getTranslations('content'),
                 'blog_category_id' => $post->blog_category_id,
@@ -130,5 +131,20 @@ class BlogPostController extends Controller
 
         return redirect()->route('blog.posts.index')
             ->with('success', __('ui.post_deleted'));
+    }
+
+    /**
+     * Get base slugs for all locales
+     */
+    private function getBaseSlugs($model): array
+    {
+        $baseSlugs = [];
+        $availableLocales = array_keys(config('app.available_locales'));
+        
+        foreach ($availableLocales as $locale) {
+            $baseSlugs[$locale] = $model->getLocalizedBaseSlug($locale) ?? '';
+        }
+        
+        return $baseSlugs;
     }
 }

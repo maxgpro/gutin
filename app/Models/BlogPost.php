@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Str;
 use Spatie\Translatable\HasTranslations;
 
 class BlogPost extends Model
 {
-    use HasFactory, HasTranslations;
+    use HasFactory, HasTranslations, HasSlug;
 
     public $translatable = ['title', 'slug', 'excerpt', 'content'];
 
@@ -47,71 +47,6 @@ class BlogPost extends Model
         'views_count' => 'integer',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($post) {
-            $post->generateSlugsForAllLocales();
-        });
-
-        static::updating(function ($post) {
-            if ($post->isDirty('title')) {
-                $post->generateSlugsForAllLocales();
-            }
-        });
-    }
-
-    /**
-     * Generate slugs for all available locales
-     */
-    public function generateSlugsForAllLocales(): void
-    {
-        $availableLocales = array_keys(config('app.available_locales'));
-        $slugs = [];
-
-        foreach ($availableLocales as $locale) {
-            $title = $this->getTranslation('title', $locale);
-            if ($title) {
-                $slugs[$locale] = $this->generateUniqueSlug($title, $locale);
-            }
-        }
-
-        $this->slug = $slugs;
-    }
-
-    /**
-     * Generate unique slug for specific locale
-     */
-    private function generateUniqueSlug(string $title, string $locale): string
-    {
-        $baseSlug = Str::slug($title);
-        $slug = $baseSlug;
-        $counter = 1;
-
-        while ($this->slugExistsInLocale($slug, $locale)) {
-            $slug = $baseSlug . '-' . $counter;
-            $counter++;
-        }
-
-        return $slug;
-    }
-
-    /**
-     * Check if slug exists in specific locale
-     */
-    private function slugExistsInLocale(string $slug, string $locale): bool
-    {
-        $query = static::query();
-        
-        if ($this->exists) {
-            $query->where('id', '!=', $this->id);
-        }
-        
-        // PostgreSQL JSONB operator to extract text value for the given locale
-        return $query->whereRaw("slug->>? = ?", [$locale, $slug])->exists();
-    }
-
     /**
      * Scope for ordering by localized title
      */
@@ -121,17 +56,6 @@ class BlogPost extends Model
         
         // PostgreSQL JSONB operator to order by localized title
         return $query->orderByRaw("title->>? {$direction}", [$locale]);
-    }
-
-    /**
-     * Find post by slug in current locale
-     */
-    public static function findBySlug(string $slug, ?string $locale = null): ?self
-    {
-        $locale = $locale ?: app()->getLocale();
-        
-        // PostgreSQL JSONB operator to match by localized slug
-        return static::whereRaw("slug->>? = ?", [$locale, $slug])->first();
     }
 
     public function user(): BelongsTo
@@ -174,30 +98,5 @@ class BlogPost extends Model
     public function incrementViews(): void
     {
         $this->increment('views_count');
-    }
-
-    public function getRouteKeyName(): string
-    {
-        return 'id';
-    }
-
-    /**
-     * Resolve route model binding for slug
-     */
-    public function resolveRouteBinding($value, $field = null)
-    {
-        // If it's numeric, treat as ID
-        if (is_numeric($value)) {
-            return $this->where('id', $value)->first();
-        }
-
-        // Otherwise treat as slug and search in current locale
-        return $this->findBySlug($value);
-    }
-
-    public function getReadingTimeAttribute(): int
-    {
-        $wordCount = str_word_count(strip_tags($this->content));
-        return max(1, ceil($wordCount / 200)); // Assume 200 words per minute
     }
 }

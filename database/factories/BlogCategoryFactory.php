@@ -45,7 +45,7 @@ class BlogCategoryFactory extends Factory
         $index = fake()->unique()->numberBetween(0, count($categories['ru']) - 1);
 
         return [
-            'name' => [
+            'title' => [
                 'ru' => $categories['ru'][$index],
                 'en' => $categories['en'][$index],
                 'fr' => $categories['fr'][$index],

@@ -72,7 +72,7 @@ function getStatusLabel(status: string): string {
                     class="rounded-full px-2 py-1 text-xs font-medium text-white"
                     :style="{ backgroundColor: post.category.color }"
                 >
-                    {{ getLocalized(post.category.name) }}
+                    {{ getLocalized(post.category.title) }}
                 </div>
                 <Badge 
                     v-if="post.status !== 'published'"
@@ -87,7 +87,7 @@ function getStatusLabel(status: string): string {
         <CardContent class="flex-1 p-6">
             <div v-if="!post.featured_image" class="mb-3 flex gap-2">
                 <Badge variant="secondary" :style="{ backgroundColor: post.category.color + '20', color: post.category.color }">
-                    {{ getLocalized(post.category.name) }}
+                    {{ getLocalized(post.category.title) }}
                 </Badge>
                 <Badge 
                     v-if="post.status !== 'published'"

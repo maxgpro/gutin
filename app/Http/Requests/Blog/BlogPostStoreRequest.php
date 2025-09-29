@@ -18,7 +18,7 @@ class BlogPostStoreRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable','string','max:255', new UniqueJsonTranslation(BlogPost::class, 'slug')],
+            'slug' => ['nullable','string','max:255', new UniqueJsonTranslation(BlogPost::class, 'slug', null, null, true)],
             'blog_category_id' => ['required', 'exists:blog_categories,id'],
             'excerpt' => ['nullable', 'string'],
             'content' => ['required', 'string'],
