@@ -45,7 +45,8 @@ class BlogPostFactory extends Factory
 
         // Generate multilingual titles
         $titles = [
-            'ru' => fake('ru_RU')->sentence(rand(3, 8)),
+            // Для русской локали используем локализованный провайдер текста
+            'ru' => fake('ru_RU')->realTextBetween(20, 60),
             'en' => fake('en_US')->sentence(rand(3, 8)),
             'fr' => fake('fr_FR')->sentence(rand(3, 8)),
         ];
@@ -57,33 +58,26 @@ class BlogPostFactory extends Factory
             $paragraphCount = fake()->numberBetween(3, 8);
 
             for ($i = 0; $i < $paragraphCount; $i++) {
-                $sentences = fake()->numberBetween(3, 7);
-                $paragraphs[] = '<p>' . fake($locale === 'ru' ? 'ru_RU' : ($locale === 'fr' ? 'fr_FR' : 'en_US'))->paragraph($sentences) . '</p>';
+                if ($locale === 'ru') {
+                    // Локализованный русский текст абзацами
+                    $paragraphs[] = '<p>' . fake('ru_RU')->realTextBetween(280, 560) . '</p>';
+                } else {
+                    $sentences = fake()->numberBetween(3, 7);
+                    $paragraphs[] = '<p>' . fake($locale === 'fr' ? 'fr_FR' : 'en_US')->paragraph($sentences) . '</p>';
+                }
             }
 
             // Add some code blocks occasionally
             if (fake()->boolean(30)) {
                 $codeBlock = '<pre><code class="language-php">' .
                     fake()->randomElement([
-                        '<?php
-
-function example() {
-    return "Hello World!";
-}',
-                        '<?php
-
-class Example {
-    public function method() {
-        // Some logic here
-        return $this->data;
-    }
-}',
-                        'npm install laravel-mix
-npm run dev',
+                        '<?php\n\nfunction example() {\n    return "Hello World!";\n}',
+                        '<?php\n\nclass Example {\n    public function method() {\n        // Some logic here\n        return $this->data;\n    }\n}',
+                        'npm install laravel-mix\nnpm run dev',
                     ]) . '</code></pre>';
 
                 // Insert code block at random position
-                $insertAt = fake()->numberBetween(1, count($paragraphs) - 1);
+                $insertAt = fake()->numberBetween(1, max(1, count($paragraphs) - 1));
                 array_splice($paragraphs, $insertAt, 0, $codeBlock);
             }
 
@@ -95,7 +89,7 @@ npm run dev',
             'blog_category_id' => BlogCategory::factory(),
             'title' => $titles,
             'excerpt' => [
-                'ru' => fake('ru_RU')->paragraph(3),
+                'ru' => fake('ru_RU')->realTextBetween(160, 260),
                 'en' => fake('en_US')->paragraph(3),
                 'fr' => fake('fr_FR')->paragraph(3),
             ],
@@ -104,7 +98,7 @@ npm run dev',
             'meta_data' => [
                 'meta_title' => $titles,
                 'meta_description' => [
-                    'ru' => fake('ru_RU')->sentence(15),
+                    'ru' => fake('ru_RU')->realTextBetween(100, 160),
                     'en' => fake('en_US')->sentence(15),
                     'fr' => fake('fr_FR')->sentence(15),
                 ],

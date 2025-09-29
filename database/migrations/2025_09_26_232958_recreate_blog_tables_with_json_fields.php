@@ -66,7 +66,7 @@ return new class extends Migration
         // Restore original tables structure
         Schema::create('blog_categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('title');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->string('color', 7)->default('#3B82F6');

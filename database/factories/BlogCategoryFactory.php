@@ -51,7 +51,7 @@ class BlogCategoryFactory extends Factory
                 'fr' => $categories['fr'][$index],
             ],
             'description' => [
-                'ru' => fake('ru_RU')->sentence(10, 20),
+                'ru' => fake('ru_RU')->realTextBetween(100, 200),
                 'en' => fake('en_US')->sentence(10, 20),
                 'fr' => fake('fr_FR')->sentence(10, 20),
             ],
