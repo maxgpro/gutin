@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\HasSlug;
+use App\Models\Traits\OrdersByLocalizedTitle;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,7 +12,7 @@ use Spatie\Translatable\HasTranslations;
 
 class BlogCategory extends Model
 {
-    use HasFactory, HasTranslations, HasSlug;
+    use HasFactory, HasTranslations, HasSlug, OrdersByLocalizedTitle;
 
     public $translatable = ['title', 'slug', 'description'];
 
@@ -30,14 +31,14 @@ class BlogCategory extends Model
         'is_active' => 'boolean',
     ];
 
+    // Ordering scope moved to OrdersByLocalizedTitle trait
+
     /**
-     * Scope for ordering by localized title
+     * Scope: only active categories
      */
-    public function scopeOrderByLocalizedTitle($query, ?string $locale = null, string $direction = 'asc')
+    public function scopeActive($query)
     {
-        $locale = $locale ?: app()->getLocale();
-        // PostgreSQL JSONB operator to order by localized title
-        return $query->orderByRaw("title->>? {$direction}", [$locale]);
+        return $query->where('is_active', true);
     }
 
     public function posts(): HasMany

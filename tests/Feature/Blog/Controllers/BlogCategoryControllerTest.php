@@ -64,7 +64,7 @@ test('admin can create category', function () {
 
     // Check that category was created
     $category = BlogCategory::where('color', '#ff0000')
-        ->where('is_active', true)
+        ->active()
         ->first();
     
     expect($category)->not->toBeNull();

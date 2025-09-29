@@ -29,13 +29,7 @@ class BlogPostService
         return $query->paginate($perPage);
     }
 
-    /**
-     * Get active blog categories
-     */
-    public function getActiveCategories(): Collection
-    {
-        return BlogCategory::where('is_active', true)->get();
-    }
+    // getActiveCategories moved to BlogCategoryService
 
     /**
      * Apply status filter to query

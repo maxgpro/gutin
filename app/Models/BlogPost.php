@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\HasSlug;
+use App\Models\Traits\OrdersByLocalizedTitle;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Spatie\Translatable\HasTranslations;
 
 class BlogPost extends Model
 {
-    use HasFactory, HasTranslations, HasSlug;
+    use HasFactory, HasTranslations, HasSlug, OrdersByLocalizedTitle;
 
     public $translatable = ['title', 'slug', 'excerpt', 'content'];
 
@@ -47,16 +48,7 @@ class BlogPost extends Model
         'views_count' => 'integer',
     ];
 
-    /**
-     * Scope for ordering by localized title
-     */
-    public function scopeOrderByLocalizedTitle($query, ?string $locale = null, string $direction = 'asc')
-    {
-        $locale = $locale ?: app()->getLocale();
-        
-        // PostgreSQL JSONB operator to order by localized title
-        return $query->orderByRaw("title->>? {$direction}", [$locale]);
-    }
+    // Ordering scope moved to OrdersByLocalizedTitle trait
 
     public function user(): BelongsTo
     {

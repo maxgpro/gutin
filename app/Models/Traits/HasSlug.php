@@ -120,6 +120,23 @@ trait HasSlug
     }
 
     /**
+     * Get base slugs for all available locales
+     *
+     * @return array<string, string>
+     */
+    public function getAllBaseSlugs(): array
+    {
+        $baseSlugs = [];
+        $availableLocales = array_keys(config('app.available_locales'));
+
+        foreach ($availableLocales as $locale) {
+            $baseSlugs[$locale] = $this->getLocalizedBaseSlug($locale) ?? '';
+        }
+
+        return $baseSlugs;
+    }
+
+    /**
      * Set base slug for specific locale (will be prefixed with ID automatically)
      */
     public function setLocalizedBaseSlug(string $baseSlug, ?string $locale = null): void

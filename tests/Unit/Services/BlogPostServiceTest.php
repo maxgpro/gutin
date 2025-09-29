@@ -24,19 +24,6 @@ class BlogPostServiceTest extends TestCase
         $this->service = new BlogPostService();
     }
 
-    public function test_get_active_categories_returns_only_active_categories()
-    {
-        // Create active and inactive categories
-        $activeCategory = BlogCategory::factory()->active()->create();
-        $inactiveCategory = BlogCategory::factory()->create(['is_active' => false]);
-
-        $result = $this->service->getActiveCategories();
-
-        $this->assertCount(1, $result);
-        $this->assertTrue($result->contains($activeCategory));
-        $this->assertFalse($result->contains($inactiveCategory));
-    }
-
     public function test_get_filtered_posts_applies_status_filter()
     {
         // Create admin user and authenticate

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
 use App\Services\BlogPostService;
+use App\Services\BlogCategoryService;
 use App\Http\Resources\BlogPostResource;
 use App\Http\Resources\BlogCategoryResource;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -19,12 +20,13 @@ class BlogPostController extends Controller
     use AuthorizesRequests;
 
     public function __construct(
-        protected BlogPostService $blogPostService
+        protected BlogPostService $blogPostService,
+        protected BlogCategoryService $categoryService,
     ) {}
     public function index(BlogPostIndexRequest $request)
     {
         $posts = $this->blogPostService->getFilteredPosts($request);
-        $categories = $this->blogPostService->getActiveCategories();
+    $categories = $this->categoryService->getActiveCategories();
         /** @var \App\Models\User|null $user */
         $user = Auth::user();
 
@@ -49,7 +51,7 @@ class BlogPostController extends Controller
     {
         $this->authorize('create', BlogPost::class);
 
-        $categories = $this->blogPostService->getActiveCategories();
+    $categories = $this->categoryService->getActiveCategories();
 
         return Inertia::render('Blog/Posts/Create', [
             // Для формы создания списка категорий достаточно локализованных названий
@@ -92,7 +94,7 @@ class BlogPostController extends Controller
     {
         $this->authorize('update', $post);
 
-        $categories = $this->blogPostService->getActiveCategories();
+    $categories = $this->categoryService->getActiveCategories();
 
         return Inertia::render('Blog/Posts/Edit', [
             // Для формы редактирования нужен полный набор переводов поста
@@ -100,7 +102,7 @@ class BlogPostController extends Controller
                 'id' => $post->id,
                 'title' => $post->getTranslations('title'),
                 'slug' => $post->getTranslations('slug'),
-                'base_slug' => $this->getBaseSlugs($post),
+                'base_slug' => $post->getAllBaseSlugs(),
                 'excerpt' => $post->getTranslations('excerpt'),
                 'content' => $post->getTranslations('content'),
                 'blog_category_id' => $post->blog_category_id,
@@ -133,18 +135,5 @@ class BlogPostController extends Controller
             ->with('success', __('ui.post_deleted'));
     }
 
-    /**
-     * Get base slugs for all locales
-     */
-    private function getBaseSlugs($model): array
-    {
-        $baseSlugs = [];
-        $availableLocales = array_keys(config('app.available_locales'));
-        
-        foreach ($availableLocales as $locale) {
-            $baseSlugs[$locale] = $model->getLocalizedBaseSlug($locale) ?? '';
-        }
-        
-        return $baseSlugs;
-    }
+    // Helper removed — now provided by HasSlug::getAllBaseSlugs()
 }
