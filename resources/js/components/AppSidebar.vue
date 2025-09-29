@@ -32,7 +32,7 @@ const mainNavItems = computed(() => {
             href: blog.posts.index(),
             icon: FileText,
         });
-    if (page.props.auth) {
+    if (page.props.auth.user) {
         items.push(
         {
             title: 'Dashboard',

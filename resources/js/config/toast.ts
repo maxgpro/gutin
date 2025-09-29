@@ -6,9 +6,10 @@ import type { ExternalToast } from 'vue-sonner';
 export const toastConfig = {
     // Default Toaster component settings
     toaster: {
-        position: 'bottom-right' as const,
-        closeButton: false,
-        // closeButtonPosition: 'top-left' as const,
+        position: 'top-right' as const,
+        theme: 'system',
+        closeButton: true,
+        closeButtonPosition: 'top-left' as const,
         richColors: false,
         duration: 4000,
         expand: true,
