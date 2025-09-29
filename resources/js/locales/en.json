@@ -21,7 +21,8 @@
         "yesterday": "Yesterday",
         "days_ago": "{count, plural, one {# day ago} other {# days ago}}",
         "updating": "Updating...",
-        "creating": "Creating..."
+        "creating": "Creating...",
+        "back_to_top": "Back to top"
     },
     "navigation": {
         "dashboard": "Dashboard",

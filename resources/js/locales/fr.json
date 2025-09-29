@@ -21,7 +21,8 @@
         "yesterday": "Hier",
         "days_ago": "{count, plural, one {il y a # jour} other {il y a # jours}}",
         "updating": "Mise à jour...",
-        "creating": "Création..."
+        "creating": "Création...",
+        "back_to_top": "Haut de page"
     },
     "navigation": {
         "dashboard": "Tableau de bord",

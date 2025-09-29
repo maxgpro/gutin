@@ -21,7 +21,8 @@
         "yesterday": "Вчера",
         "days_ago": "{count, plural, one {# день назад} few {# дня назад} many {# дней назад} other {# дней назад}}",
         "updating": "Обновление...",
-        "creating": "Создание..."
+        "creating": "Создание...",
+        "back_to_top": "Наверх"
     },
     "navigation": {
         "dashboard": "Панель управления",
