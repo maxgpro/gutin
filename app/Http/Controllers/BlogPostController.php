@@ -121,6 +121,12 @@ class BlogPostController extends Controller
         
         $post = $this->blogPostService->updatePost($post, $validated);
 
+        if ($request->boolean('stay')) {
+            // Вернуть ту же страницу редактирования без смены URL и показать сообщение только для этого ответа
+            session()->now('success', __('ui.post_updated'));
+            return $this->edit($post);
+        }
+
         return redirect()->route('blog.posts.show', $post)
             ->with('success', __('ui.post_updated'));
     }

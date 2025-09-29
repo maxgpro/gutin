@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Icon from '@/components/Icon.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +15,7 @@ import type { BlogCategoriesEditProps } from '@/types/blog';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { Edit, Loader2, Save as IconSave } from 'lucide-vue-next';
 
 const props = defineProps<BlogCategoriesEditProps>();
 const { getLocalized } = useLocalizedField();
@@ -49,6 +49,14 @@ function submit() {
     form.put(blog.categories.update(props.category).url);
 }
 
+function saveOnly() {
+    form.transform((data) => ({ ...data, stay: true }))
+        .put(blog.categories.update(props.category).url, {
+            onFinish: () => form.transform((data) => data),
+            preserveScroll: true,
+        });
+}
+
 // When app locale changes, rehydrate form fields with that locale values
 watch(locale, (newLocale) => {
     form.title = getLocalized(props.category.title, newLocale, '');
@@ -65,7 +73,7 @@ watch(locale, (newLocale) => {
             <Card>
                 <CardHeader>
                     <CardTitle class="flex items-center gap-2">
-                        <Icon name="edit-3" class="h-5 w-5" />
+                        <Edit :size="16" class="h-5 w-5" />
                         {{ t('blog.categories.edit') }}
                     </CardTitle>
                 </CardHeader>
@@ -143,11 +151,18 @@ watch(locale, (newLocale) => {
                             <Button type="button" variant="outline" as-child>
                                 <Link :href="blog.categories.index().url">{{ t('common.cancel') }}</Link>
                             </Button>
-                            <Button type="submit" :disabled="form.processing">
-                                <Icon v-if="form.processing" name="loader-2" class="mr-2 h-4 w-4 animate-spin" />
-                                <Icon v-else name="save" class="mr-2 h-4 w-4" />
-                                {{ form.processing ? t('common.updating') : t('common.update') }}
-                            </Button>
+                            <div class="flex items-center gap-2">
+                                <Button type="button" variant="secondary" :disabled="form.processing" @click="saveOnly">
+                                    <Loader2 v-if="form.processing" class="w-4 h-4 mr-2 animate-spin" />
+                                    <IconSave v-else :size="16" class="mr-2 h-4 w-4" />
+                                    {{ t('common.save') }}
+                                </Button>
+                                <Button type="submit" :disabled="form.processing">
+                                    <Loader2 v-if="form.processing" class="w-4 h-4 mr-2 animate-spin" />
+                                    <IconSave v-else :size="16" class="mr-2 h-4 w-4" />
+                                    {{ t('common.save_and_close') }}
+                                </Button>
+                            </div>
                         </div>
                     </form>
                 </CardContent>

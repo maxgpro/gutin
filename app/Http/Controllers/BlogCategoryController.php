@@ -85,6 +85,12 @@ class BlogCategoryController extends Controller
     {
         $this->categoryService->updateCategory($category, $request->validated());
 
+        if ($request->boolean('stay')) {
+            // Вернуть ту же страницу редактирования без смены URL и показать сообщение только для этого ответа
+            session()->now('success', __('ui.category_updated'));
+            return $this->edit($category);
+        }
+
         return redirect()->route('blog.categories.index')
             ->with('success', __('ui.category_updated'));
     }
