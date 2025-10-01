@@ -111,9 +111,31 @@ php artisan test --filter=Blog
 
 Ниже — инструкции для VPS/выделенного сервера и для хостинга сайтов (shared/виртуальный хостинг с панелями).
 
+> 💡 **Быстрый старт**: Для Ubuntu 24.04 используйте готовый скрипт `./srv_setup.bash` — он автоматически установит все необходимые пакеты.
+
 ### A. VPS/Выделенный сервер (Nginx + PHP-FPM)
 
 0) Установка системных пакетов (Ubuntu 24.04)
+
+**Автоматическая установка (рекомендуется):**
+
+```bash
+# Запуск готового скрипта установки
+chmod +x srv_setup.bash
+./srv_setup.bash
+```
+
+Скрипт `srv_setup.bash` автоматически установит:
+- PHP 8.4 с необходимыми расширениями
+- PostgreSQL 18
+- Nginx  
+- Node.js 24 LTS
+- Composer
+- Git, unzip
+- Supervisor для очередей
+- UFW firewall с правильными портами
+
+**Ручная установка (альтернативно):**
 
 ```bash
 # Обновление системы
@@ -219,9 +241,13 @@ php artisan optimize
 
 5) SSR-сервер Inertia (если SSR включён — см. `config/inertia.php`)
 
+**Вариант A: С SSR (рекомендуется для VPS)**
 ```bash
+# Сборка с SSR
+npm run build:ssr
+
 # Запуск SSR-сервера вручную (для тестирования)
-php artisan inertia:start-ssr --port=13714
+php artisan inertia:start-ssr
 
 # Systemd service для автозапуска SSR
 sudo tee /etc/systemd/system/laravel-ssr.service > /dev/null <<EOF
@@ -233,7 +259,7 @@ After=network.target
 Type=simple
 User=www-data
 WorkingDirectory=/var/www/myapp
-ExecStart=/usr/bin/php artisan inertia:start-ssr --port=13714
+ExecStart=/usr/bin/php artisan inertia:start-ssr
 Restart=always
 RestartSec=3
 
@@ -244,6 +270,20 @@ EOF
 sudo systemctl enable laravel-ssr
 sudo systemctl start laravel-ssr
 sudo systemctl status laravel-ssr
+```
+
+**Вариант B: Без SSR (упрощенный деплой)**
+```bash
+# Отключить SSR
+echo "INERTIA_SSR_ENABLED=false" >> .env
+
+# Обычная сборка
+npm run build
+
+# Очистить кэши
+php artisan config:cache
+
+# SSR процесс не нужен - только Nginx
 ```
 
 6) Веб-сервер Nginx
@@ -410,10 +450,64 @@ php artisan optimize
 5) SSR на shared-хостинге
 
 Если нет возможности держать фон-процесс SSR:
-- Отключите SSR: в `config/inertia.php` → `'ssr' => ['enabled' => false]` (и закоммитьте)
-- Пересоберите фронт: `npm run build`
+
+**Способ 1: Через .env переменную**
+```bash
+# Добавить в .env
+echo "INERTIA_SSR_ENABLED=false" >> .env
+
+# Обычная сборка без SSR
+npm run build
+
+# Очистить кэши
+php artisan config:cache
+```
+
+**Способ 2: В config/inertia.php**
+```php
+'ssr' => [
+    'enabled' => false, // Отключить SSR
+    // ...
+],
+```
 
 Приложение будет работать без SSR; включите позже на VPS.
+
+## Устранение проблем SSR
+
+### ReferenceError: document is not defined
+
+Если SSR падает с ошибкой `document is not defined`, проблема в использовании браузерных API в серверной среде:
+
+```bash
+# Симптомы
+ReferenceError: document is not defined
+ReferenceError: localStorage is not defined
+ReferenceError: window is not defined
+```
+
+**Решение**: Оберните код в проверки среды выполнения:
+
+```typescript
+// Неправильно
+const locale = document.documentElement.lang;
+localStorage.setItem('key', 'value');
+
+// Правильно
+const locale = typeof document !== 'undefined' 
+    ? document.documentElement.lang 
+    : 'en';
+
+if (typeof localStorage !== 'undefined') {
+    localStorage.setItem('key', 'value');
+}
+```
+
+После исправления пересоберите SSR:
+```bash
+npm run build:ssr
+php artisan inertia:start-ssr
+```
 
 ### Чек-лист прод-готовности
 
@@ -457,6 +551,7 @@ $user->roles()->attach($adminRole);
 .env.example                    # Шаблон для локальной разработки
 .env.production.example         # Шаблон для продакшена
 .env.testing.example           # Шаблон для тестирования
+srv_setup.bash                 # Скрипт автоустановки системных пакетов Ubuntu 24.04
 
 app/
 ├── Http/Middleware/
@@ -495,6 +590,10 @@ php artisan serve            # Только Laravel сервер
 npm run build                 # Production сборка
 npm run build:ssr             # Сборка с SSR
 npm run lint                  # Проверка кода ESLint + Prettier
+
+# Системная установка
+chmod +x srv_setup.bash       # Права на скрипт установки
+./srv_setup.bash              # Автоустановка всех зависимостей Ubuntu 24.04
 
 # Тестирование  
 php artisan test              # Запуск всех 152 тестов

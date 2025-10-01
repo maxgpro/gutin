@@ -7,7 +7,8 @@ import fr from './locales/fr.json';
 import ru from './locales/ru.json';
 
 // Get current locale from Laravel (passed from backend)
-const currentLocale = document.documentElement.lang || 'en';
+// In SSR, document is not available, so we fall back to 'en'
+const currentLocale = typeof document !== 'undefined' ? document.documentElement.lang || 'en' : 'en';
 
 // Available locales
 export const availableLocales = [
@@ -36,10 +37,15 @@ export function switchLocale(locale: string) {
     if (availableLocales.some((l) => l.code === locale)) {
         // Update frontend locale immediately for better UX
         i18n.global.locale.value = locale as 'ru' | 'en' | 'fr';
-        document.documentElement.lang = locale;
 
-        // Save to localStorage for persistence
-        localStorage.setItem('preferred-locale', locale);
+        // Only access document and localStorage in browser environment
+        if (typeof document !== 'undefined') {
+            document.documentElement.lang = locale;
+        }
+
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('preferred-locale', locale);
+        }
 
         // Update session locale on backend and refresh the current Inertia page
         // Controller responds with redirect()->back(), so Inertia will re-visit the current route
@@ -59,6 +65,11 @@ export function switchLocale(locale: string) {
 
 // Load preferred locale from localStorage on initialization
 export function initializeLocale() {
+    // Only run in browser environment
+    if (typeof localStorage === 'undefined' || typeof document === 'undefined') {
+        return;
+    }
+
     const savedLocale = localStorage.getItem('preferred-locale');
     if (savedLocale && availableLocales.some((l) => l.code === savedLocale)) {
         const htmlLocale = document.documentElement.lang || 'en';
