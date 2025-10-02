@@ -111,7 +111,7 @@ class BlogPostService
     /**
      * Get related posts for a specific post
      */
-    public function getRelatedPosts(BlogPost $post, int $limit = null): Collection
+    public function getRelatedPosts(BlogPost $post, ?int $limit = null): Collection
     {
         $limit = $limit ?? config('app.ui.related_posts_count', 3);
 
