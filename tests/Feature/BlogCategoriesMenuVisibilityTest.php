@@ -14,8 +14,8 @@ describe('Blog Categories Menu Visibility', function () {
 
         $response->assertInertia(
             fn(Assert $page) => $page
-                ->has('auth.canCreateBlogCategories')
-                ->where('auth.canCreateBlogCategories', true)
+                ->has('auth.isAdmin')
+                ->where('auth.isAdmin', true)
         );
     });
 
@@ -26,8 +26,8 @@ describe('Blog Categories Menu Visibility', function () {
 
         $response->assertInertia(
             fn(Assert $page) => $page
-                ->has('auth.canCreateBlogCategories')
-                ->where('auth.canCreateBlogCategories', false)
+                ->has('auth.isAdmin')
+                ->where('auth.isAdmin', false)
         );
     });
 
@@ -40,8 +40,8 @@ describe('Blog Categories Menu Visibility', function () {
 
         $response->assertInertia(
             fn(Assert $page) => $page
-                ->has('auth.canCreateBlogCategories')
-                ->where('auth.canCreateBlogCategories', false)
+                ->has('auth.isAdmin')
+                ->where('auth.isAdmin', false)
         );
     });
 

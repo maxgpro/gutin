@@ -15,9 +15,7 @@ const page = usePage();
 
 const mainNavItems = computed(() => {
     const items: NavItem[] = [];
-
-    // Категории показываем только тем, кто может их создавать (админы)
-    if (page.props.auth?.canCreateBlogCategories) {
+    if (page.props.auth?.isAdmin) {
         items.push(
         {
             title: 'Blog Categories',
@@ -25,7 +23,7 @@ const mainNavItems = computed(() => {
             icon: Tag,
         });
     }
-    // Блог посты доступны всем
+
     items.push(
         {
             title: 'Blog Posts',
@@ -44,23 +42,19 @@ const mainNavItems = computed(() => {
     return items;
 });
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Github Repo',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
-    },
-    {
-        title: 'i18n Demo',
-        href: '/i18n-demo',
-        icon: BookOpen,
-    },
-];
+const footerNavItems = computed(() => {
+    const items: NavItem[] = [];
+
+    if (page.props.auth?.isAdmin) {
+        items.push(
+        {
+            title: 'i18n Demo',
+            href: '/i18n-demo',
+            icon: BookOpen,
+        });
+    }
+    return items;
+});
 </script>
 
 <template>

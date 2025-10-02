@@ -42,8 +42,7 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
-                'canCreateBlogPosts' => $this->canCreate(\App\Models\BlogPost::class),
-                'canCreateBlogCategories' => $this->canCreate(\App\Models\BlogCategory::class),
+                'isAdmin' => ($user = Auth::user()) ? $user->isAdmin() : false,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [
