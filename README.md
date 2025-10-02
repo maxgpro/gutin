@@ -292,52 +292,58 @@ php artisan config:cache
 # Создание конфига сайта (сначала только HTTP)
 sudo tee /etc/nginx/sites-available/myapp > /dev/null <<EOF
 server {
-    listen 80;
-    server_name mydomain.loc www.mydomain.loc;
+  listen 80;
+  listen [::]:80;
+  server_name _;
+  root /var/www/myapp/public;
 
-    root /var/www/myapp/public;
-    index index.php index.html;
+  add_header X-Frame-Options "SAMEORIGIN";
+  add_header X-Content-Type-Options "nosniff";
 
-    # Gzip сжатие
-    gzip on;
-    gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
+  index index.php;
 
-    # Кэширование статики
-    location ~* \\\.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf)\\\$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-        try_files \\\$uri =404;
-    }
+  charset utf-8;
 
-    location / {
-        try_files \\\$uri \\\$uri/ /index.php?\\\$query_string;
-    }
+  gzip on;
+  gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
 
-    location ~ \\\\.php\\\$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/run/php/php8.4-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME \\\$realpath_root\\\$fastcgi_script_name;
-        include fastcgi_params;
-        
-        # Таймауты для SSR
-        fastcgi_read_timeout 300;
-        fastcgi_connect_timeout 300;
-        fastcgi_send_timeout 300;
-    }
+  # Кэширование статики
+  location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf)\$ {
+      expires 1y;
+      add_header Cache-Control "public, immutable";
+      try_files \$uri =404;
+  }
 
-    # Безопасность - запрет доступа к критичным папкам
-    location ~ /(\.env|vendor|storage|bootstrap|resources|config|database|tests)/ { 
-        deny all; 
-    }
-    
-    location ~ /\\\\.ht {
-        deny all;
-    }
+  location / {
+      try_files \$uri \$uri/ /index.php?\$query_string;
+  }
+
+  location = /favicon.ico { access_log off; log_not_found off; }
+  location = /robots.txt  { access_log off; log_not_found off; }
+ 
+  error_page 404 /index.php;
+
+  location ~ ^/index\.php(/|$) {
+    include snippets/fastcgi-php.conf;
+    fastcgi_pass unix:/var/run/php/php8.4-fpm.sock;
+    fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
+    include fastcgi_params;
+    fastcgi_hide_header X-Powered-By;
+
+    # Таймауты для SSR
+    fastcgi_read_timeout 300;
+    fastcgi_connect_timeout 300;
+    fastcgi_send_timeout 300;
+  }
+
+  location ~ /\.(?!well-known).* {
+    deny all;
+  }
 }
 EOF
 
 # Активация сайта
-sudo ln -s /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/
+sudo ln -sfn /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
